@@ -8,9 +8,11 @@ class Requester:
         self,
         user_agent: Optional[str] = None,
         referer: Optional[str] = None,
+        cookies: Optional[str] = None,
     ):
         self.referer = referer
         self.user_agent = user_agent
+        self.cookies = cookies
 
     @property
     def headers(self):
@@ -26,15 +28,15 @@ class Requester:
         url: str,
         method: str,
         response_method: str,
-        headers: Any = None,
         json: Any = None,
+        headers: Any = None,
+        cookies: str = None,
     ) -> Response:
-        async with aiohttp.ClientSession(headers=self.headers) as cs:
+        async with aiohttp.ClientSession(
+            headers=self.headers, cookies=self.cookies
+        ) as cs:
             async with cs.request(
-                method,
-                url,
-                headers=headers,
-                json=json,
+                method, url, headers=headers, json=json, cookies=cookies
             ) as response:
                 dispatch = {
                     "json": response.json,
@@ -50,13 +52,24 @@ class Requester:
                 )
 
     async def get(
-        self, url: str, response_method: str = "read", headers: Any = None
+        self,
+        url: str,
+        response_method: str = "read",
+        headers: Any = None,
+        cookies: str = None,
     ) -> Response:
         """Perform HTTP GET request."""
-        return await self.request(url, "GET", response_method, headers)
+        return await self.request(
+            url, "GET", response_method, headers=headers, cookies=cookies
+        )
 
     async def post(
-        self, url: str, response_method: str, json: Any = None, headers: Any = None
+        self,
+        url: str,
+        response_method: str,
+        json: Any = None,
+        headers: Any = None,
+        cookies: str = None,
     ) -> Response:
         """Perform HTTP POST request."""
-        return await self.request(url, "POST", response_method, json, headers)
+        return await self.request(url, "POST", response_method, json, headers, cookies)
