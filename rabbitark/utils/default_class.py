@@ -1,3 +1,6 @@
+from typing import Any
+
+
 class Image:
     def __init__(self, url: str, filename: str = None):
         self.url = url
@@ -5,12 +8,14 @@ class Image:
 
 
 class Info:
-    def __init__(self, title: str, image: list[Image]):
+    def __init__(self, title: str, image: list[Image], headers: Any = None):
         self.title = title
         self.image = image
+        self.headers = headers
 
 
 class DownloadInfo:
-    def __init__(self, url: str, directory: str):
+    def __init__(self, url: str, directory: str, headers: Any = None):
         self.url = url
         self.directory = directory
+        self.headers = headers
