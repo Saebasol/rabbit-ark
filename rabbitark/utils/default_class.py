@@ -19,3 +19,10 @@ class DownloadInfo:
         self.url = url
         self.directory = directory
         self.headers = headers
+
+
+class Response:
+    def __init__(self, status: int, message: str, response: Any):
+        self.status = status
+        self.message = message
+        self.response = response
