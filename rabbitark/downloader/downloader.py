@@ -1,4 +1,5 @@
 import os
+from typing import Generator, Union
 
 import aiofiles
 import aiofiles.os as aioos
@@ -23,7 +24,7 @@ class Downloader(Requester):
             if not os.path.exists(f"{self.base_directory}/{self.folder}/{title}"):
                 await aioos.mkdir(f"{self.base_directory}/{self.folder}/{title}")
 
-    def check_folder(self, title: str, filename: str):
+    def check_folder(self, title: str, filename: str) -> str:
         if title:
             directory = f"{self.base_directory}/{self.folder}/{title}/{filename}"
         else:
@@ -31,7 +32,7 @@ class Downloader(Requester):
 
         return directory
 
-    def directory_generator(self, info: Info) -> DownloadInfo:
+    def download_info_generator(self, info: Info) -> Generator[DownloadInfo]:
         for image in info.image:
             yield DownloadInfo(
                 image.url,
@@ -39,13 +40,27 @@ class Downloader(Requester):
                 info.headers if info.headers else {},
             )
 
+    def checking_image_object(
+        self, info: Info
+    ) -> Union[Generator[DownloadInfo], list[DownloadInfo]]:
+        if isinstance(info.image, list):
+            return self.download_info_generator(info)
+        else:
+            return [
+                DownloadInfo(
+                    info.image.url,
+                    self.check_folder(info.title, info.image.filename),
+                    info.headers if info.headers else {},
+                )
+            ]
+
     async def download(self, download_info: DownloadInfo) -> None:
         image_byte = await self.get(download_info.url, headers=download_info.headers)
         async with aiofiles.open(download_info.directory, mode="wb") as f:
             await f.write(image_byte)
 
     async def start_download(self, info: Info) -> None:
-        download_info = self.directory_generator(info)
+        download_info = self.checking_image_object(info)
         await self.create_folder(info.title)
         async with Pool() as pool:
             async for _ in pool.map(self.download, download_info):
