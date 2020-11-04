@@ -10,7 +10,9 @@ parser = argparse.ArgumentParser("rabbitark")
 parser.add_argument("extractor", type=str, help="Specifies the extractor to use")
 
 parser.add_argument(
-    "--downloadable", help="It takes a url or an available argument value."
+    "--downloadable",
+    help="It takes a url or an available argument value.",
+    default=None,
 )
 
 parser.add_argument("--folder", type=str, help="Specifies the pre-created folder")

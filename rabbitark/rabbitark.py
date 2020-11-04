@@ -11,7 +11,7 @@ class RabbitArk(Downloader):
         super().__init__(*args, **kwargs)
         self.option = option
 
-    async def start(self, downloadable: Any):
+    async def start(self, downloadable: Any = None):
         if self.option in extractor:
             init_class = extractor[self.option]()
 
