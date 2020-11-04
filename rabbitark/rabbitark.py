@@ -7,8 +7,8 @@ from rabbitark.error import ExtractorNotFound
 
 
 class RabbitArk(Downloader):
-    def __init__(self, option, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, option):
+        super().__init__()
         self.option = option
 
     async def start(self, downloadable: Any = None):

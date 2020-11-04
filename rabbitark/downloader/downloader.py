@@ -10,8 +10,8 @@ from rabbitark.utils.default_class import DownloadInfo, Info
 
 
 class Downloader(Requester):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self):
+        super().__init__()
         self.base_directory = config.BASE_DIRECTORY
 
     async def create_folder(self, title) -> None:
