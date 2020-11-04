@@ -15,12 +15,17 @@ parser.add_argument(
     default=None,
 )
 
-parser.add_argument("--folder", type=str, help="Specifies the pre-created folder")
+parser.add_argument("--base", type=str, help="Specifies the pre-created folder")
+
+parser.add_argument("--folder", type=str, help="")
 
 args = parser.parse_args()
 
-if args.folder:
+if args.base:
     config.BASE_DIRECTORY = args.folder
+
+if not args.folder:
+    config.FOLDER = f"rabbitark_{args.extractor}"
 
 if __name__ == "__main__":
     ark = RabbitArk(args.extractor)

@@ -67,7 +67,7 @@ class Hitomi(HitomiRequester):
 
     async def download_info(self, index) -> Info:
         images, model = await self.images(index)
-        return Info(model.galleryid, images, self.headers)
+        return Info(images, model.galleryid, self.headers)
 
     async def multiple_download_info(self, index_list: list):
         for index in index_list:
