@@ -32,7 +32,7 @@ class Downloader(Requester):
 
         return directory
 
-    def download_info_generator(self, info: Info) -> Generator[DownloadInfo]:
+    def download_info_generator(self, info: Info) -> DownloadInfo:
         for image in info.image:
             yield DownloadInfo(
                 image.url,
@@ -40,9 +40,7 @@ class Downloader(Requester):
                 info.headers if info.headers else {},
             )
 
-    def checking_image_object(
-        self, info: Info
-    ) -> Union[Generator[DownloadInfo], list[DownloadInfo]]:
+    def checking_image_object(self, info: Info) -> DownloadInfo:
         if isinstance(info.image, list):
             return self.download_info_generator(info)
         else:
@@ -57,7 +55,7 @@ class Downloader(Requester):
     async def download(self, download_info: DownloadInfo) -> None:
         image_byte = await self.get(download_info.url, headers=download_info.headers)
         async with aiofiles.open(download_info.directory, mode="wb") as f:
-            await f.write(image_byte)
+            await f.write(image_byte.body)
 
     async def start_download(self, info: Info) -> None:
         download_info = self.checking_image_object(info)

@@ -22,7 +22,7 @@ class DownloadInfo:
 
 
 class Response:
-    def __init__(self, status: int, message: str, response: Any):
+    def __init__(self, status: int, message: str, body: Any):
         self.status = status
         self.message = message
-        self.response = response
+        self.body = body

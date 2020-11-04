@@ -47,7 +47,7 @@ class HitomiRequester(Requester):
 
     async def get_galleryinfo(self, index):
         response = await self.get(f"https://ltn.hitomi.la/galleries/{index}.js", "text")
-        js_to_json = response.replace("var galleryinfo = ", "")
+        js_to_json = response.body.replace("var galleryinfo = ", "")
         return parse_galleryinfo(json.loads(js_to_json))
 
     async def images(self, index: int) -> tuple[list[Image], HitomiGalleryInfoModel]:
