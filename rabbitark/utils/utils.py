@@ -1,3 +1,5 @@
+import re
+
 from aiomultiprocess import Pool
 from http.cookies import SimpleCookie
 
@@ -22,3 +24,7 @@ def load_cookie(rawdata):
     cookie = SimpleCookie()
     cookie.load(rawdata)
     return {key: morsel.value for key, morsel in cookie.items()}
+
+
+def folder_name_checker(foldername):
+    return re.sub(r"[\\/:*?\"<>\|]", "", foldername)
