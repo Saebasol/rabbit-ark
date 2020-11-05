@@ -1,4 +1,5 @@
 import re
+
 from aiomultiprocess import Pool
 from http.cookies import SimpleCookie
 from http.cookiejar import MozillaCookieJar
@@ -32,5 +33,5 @@ def load_cookie_txt(filename):
     return {each.name: each.value for each in cj}
 
 
-def folder_name_changer(foldername):
+def folder_name_checker(foldername):
     return re.sub(r"[\\/:*?\"<>\|]", "", foldername)
