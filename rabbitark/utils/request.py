@@ -13,18 +13,10 @@ class Requester:
         return self.kwargs.get("headers")
 
     async def request(
-        self,
-        url: str,
-        method: str,
-        response_method: str,
-        json: Any = None,
-        headers: Any = None,
-        cookies: str = None,
+        self, url: str, method: str, response_method: str, *args, **kwargs
     ) -> Response:
         async with aiohttp.ClientSession(*self.args, **self.kwargs) as cs:
-            async with cs.request(
-                method, url, headers=headers, json=json, cookies=cookies
-            ) as response:
+            async with cs.request(method, url, *args, **kwargs) as response:
                 dispatch = {
                     "json": response.json,
                     "read": response.read,
@@ -39,24 +31,11 @@ class Requester:
                 )
 
     async def get(
-        self,
-        url: str,
-        response_method: str = "read",
-        headers: Any = None,
-        cookies: str = None,
+        self, url: str, response_method: str = "read", *args, **kwargs
     ) -> Response:
         """Perform HTTP GET request."""
-        return await self.request(
-            url, "GET", response_method, headers=headers, cookies=cookies
-        )
+        return await self.request(url, "GET", response_method, *args, **kwargs)
 
-    async def post(
-        self,
-        url: str,
-        response_method: str,
-        json: Any = None,
-        headers: Any = None,
-        cookies: str = None,
-    ) -> Response:
+    async def post(self, url: str, response_method: str, *args, **kwargs) -> Response:
         """Perform HTTP POST request."""
-        return await self.request(url, "POST", response_method, json, headers, cookies)
+        return await self.request(url, "POST", response_method, *args, **kwargs)
