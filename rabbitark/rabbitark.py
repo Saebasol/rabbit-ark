@@ -1,10 +1,10 @@
 import os
-
 from typing import Any
+
 from rabbitark.downloader.downloader import Downloader
+from rabbitark.error import ExtractorNotFound
 from rabbitark.utils.extractor_dict import extractor
 from rabbitark.utils.load_dynamic_module import load_extensions
-from rabbitark.error import ExtractorNotFound
 
 
 class RabbitArk(Downloader):
