@@ -1,7 +1,7 @@
 from typing import Any
 from rabbitark.utils.request import Requester
 from rabbitark.utils.default_class import Image, Info
-from rabbitark.utils.utils import get_urls, split
+from rabbitark.utils.utils import get_urls, split, folder_name_checker
 from rabbitark.error import NotFound
 
 
@@ -19,14 +19,14 @@ class PixivRequester(Requester):
             f"https://www.pixiv.net/ajax/illust/{illust_id}",
             "json",
         )
-        if info.status == 299:
+        if info.status == 200:
             return info.body
         else:
             return
 
     async def get_illust_urls(self, illust_id):
         info = await self.get(
-            f"https://www.pixiv.net/ajax/illust/{illust_id}/pages",
+            f"https://www.pixiv.net/ajax/illust/{illust_id}/page",
             "json",
         )
         return [page["urls"]["original"] for page in info.body["body"]]
@@ -67,14 +67,22 @@ class PixivRequester(Requester):
         if not info:
             return
         urls = await self.get_illust_urls(illust_id)
-        return Info([Image(url) for url in urls], info["body"]["title"], self.headers)
+        return Info(
+            [Image(url) for url in urls],
+            folder_name_checker(info["body"]["title"]),
+            self.headers,
+        )
 
     async def user(self, user_id):
         username = await self.get_user_info(user_id)
         if not username:
             return
         url_list = await self.user_images(user_id)
-        return Info([Image(url) for url in url_list], username, self.headers)
+        return Info(
+            [Image(url) for url in url_list],
+            folder_name_checker(username),
+            self.headers,
+        )
 
 
 class Pixiv(PixivRequester):
@@ -87,7 +95,7 @@ class Pixiv(PixivRequester):
         else:
             if "artwork" in downloadable:
                 info = await self.single_images(split(downloadable))
-            elif "users" in downloadable:
+            elif "user" in downloadable:
                 info = await self.user(split(downloadable))
             else:
                 raise NotFound(downloadable)
