@@ -1,5 +1,4 @@
 import os
-from typing import Generator, Union
 
 import aiofiles
 import aiofiles.os as aioos

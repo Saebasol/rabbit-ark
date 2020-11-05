@@ -1,10 +1,12 @@
 from typing import Any
 
+from rabbitark.utils.utils import split
+
 
 class Image:
     def __init__(self, url: str, filename: str = None):
         self.url = url
-        self.filename = filename if filename else url.rsplit("/", 1)[1]
+        self.filename = filename if filename else split(url)
 
 
 class Info:
