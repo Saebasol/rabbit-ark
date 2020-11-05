@@ -114,7 +114,7 @@ def full_path_from_hash(hash_: str) -> str:
     if len(hash_) < 3:
         return hash_
 
-    result = hash_[len(hash_) - 3 :]
+    result = hash_[len(hash_) - 3:]
     a = result[0:2]
     b = result[-1]
     return f"{b}/{a}/" + hash_
@@ -161,11 +161,14 @@ def parse_galleryinfo(galleryinfo_json: dict) -> HitomiGalleryInfoModel:
         parsed_tags = []
         for tag in galleryinfo_json["tags"]:
             if not tag.get("male") and tag.get("female"):
-                parsed_tags.append({"value": f"female:{tag['tag']}", "url": tag["url"]})
+                parsed_tags.append(
+                    {"value": f"female:{tag['tag']}", "url": tag["url"]})
             elif tag.get("male") and not tag.get("female"):
-                parsed_tags.append({"value": f"male:{tag['tag']}", "url": tag["url"]})
+                parsed_tags.append(
+                    {"value": f"male:{tag['tag']}", "url": tag["url"]})
             elif not tag.get("male") and not tag.get("female"):
-                parsed_tags.append({"value": f"tag:{tag['tag']}", "url": tag["url"]})
+                parsed_tags.append(
+                    {"value": f"tag:{tag['tag']}", "url": tag["url"]})
             elif tag.get("male") and tag.get("female"):
                 raise Exception
             else:
