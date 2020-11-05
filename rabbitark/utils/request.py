@@ -4,38 +4,19 @@ import aiohttp
 
 
 class Requester:
-    def __init__(
-        self,
-        user_agent: Optional[str] = None,
-        referer: Optional[str] = None,
-    ):
-        self.referer = referer
-        self.user_agent = user_agent
+    def __init__(self, *args, **kwargs):
+        self.args = args
+        self.kwargs = kwargs
 
     @property
     def headers(self):
-        headers = {}
-        if self.referer:
-            headers.update({"referer": self.referer})
-        if self.user_agent:
-            headers.update({"User-Agent": self.user_agent})
-        return headers
+        return self.kwargs.get("headers")
 
     async def request(
-        self,
-        url: str,
-        method: str,
-        response_method: str,
-        headers: Any = None,
-        json: Any = None,
+        self, url: str, method: str, response_method: str, *args, **kwargs
     ) -> Response:
-        async with aiohttp.ClientSession(headers=self.headers) as cs:
-            async with cs.request(
-                method,
-                url,
-                headers=headers,
-                json=json,
-            ) as response:
+        async with aiohttp.ClientSession(*self.args, **self.kwargs) as cs:
+            async with cs.request(method, url, *args, **kwargs) as response:
                 dispatch = {
                     "json": response.json,
                     "read": response.read,
@@ -50,13 +31,11 @@ class Requester:
                 )
 
     async def get(
-        self, url: str, response_method: str = "read", headers: Any = None
+        self, url: str, response_method: str = "read", *args, **kwargs
     ) -> Response:
         """Perform HTTP GET request."""
-        return await self.request(url, "GET", response_method, headers)
+        return await self.request(url, "GET", response_method, *args, **kwargs)
 
-    async def post(
-        self, url: str, response_method: str, json: Any = None, headers: Any = None
-    ) -> Response:
+    async def post(self, url: str, response_method: str, *args, **kwargs) -> Response:
         """Perform HTTP POST request."""
-        return await self.request(url, "POST", response_method, json, headers)
+        return await self.request(url, "POST", response_method, *args, **kwargs)
