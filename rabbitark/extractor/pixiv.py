@@ -12,10 +12,10 @@ class PixivRequester(Requester):
     def __init__(self):
         super().__init__(
             headers={
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36",
+                "User-Agent":
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36",
                 "referer": "https://pixiv.net",
-            }
-        )
+            })
 
     async def get_illust_info(self, illust_id):
         info = await self.get(
@@ -36,8 +36,7 @@ class PixivRequester(Requester):
 
     async def get_user_info(self, user_id):
         info = await self.get(
-            f"https://www.pixiv.net/ajax/user/{user_id}?full=1", "json"
-        )
+            f"https://www.pixiv.net/ajax/user/{user_id}?full=1", "json")
         if info.status == 200:
             return info.body["body"]["name"]
         else:
@@ -45,8 +44,7 @@ class PixivRequester(Requester):
 
     async def get_user_all_illust(self, user_id):
         info = await self.get(
-            f"https://www.pixiv.net/ajax/user/{user_id}/profile/all", "json"
-        )
+            f"https://www.pixiv.net/ajax/user/{user_id}/profile/all", "json")
         return info.body["body"]["illusts"].keys()
 
     async def user_images(self, user_id):
@@ -70,7 +68,8 @@ class PixivRequester(Requester):
         if not info:
             return
         urls = await self.get_illust_urls(illust_id)
-        return Info([Image(url) for url in urls], info["body"]["title"], self.headers)
+        return Info([Image(url) for url in urls], info["body"]["title"],
+                    self.headers)
 
     async def user(self, user_id):
         username = await self.get_user_info(user_id)

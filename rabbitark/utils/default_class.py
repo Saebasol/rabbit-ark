@@ -10,7 +10,10 @@ class Image:
 
 
 class Info:
-    def __init__(self, image: list[Image], title: str = None, headers: Any = None):
+    def __init__(self,
+                 image: list[Image],
+                 title: str = None,
+                 headers: Any = None):
         self.title = title
         self.image = image
         self.headers = headers

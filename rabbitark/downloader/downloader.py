@@ -21,8 +21,10 @@ class Downloader(Requester):
             await aioos.mkdir(f"{self.base_directory}/{self.folder}")
 
         if title:
-            if not os.path.exists(f"{self.base_directory}/{self.folder}/{title}"):
-                await aioos.mkdir(f"{self.base_directory}/{self.folder}/{title}")
+            if not os.path.exists(
+                    f"{self.base_directory}/{self.folder}/{title}"):
+                await aioos.mkdir(
+                    f"{self.base_directory}/{self.folder}/{title}")
 
     def check_folder(self, title: str, filename: str) -> str:
         if title:
@@ -53,7 +55,8 @@ class Downloader(Requester):
             ]
 
     async def download(self, download_info: DownloadInfo) -> None:
-        image_byte = await self.get(download_info.url, headers=download_info.headers)
+        image_byte = await self.get(download_info.url,
+                                    headers=download_info.headers)
         async with aiofiles.open(download_info.directory, mode="wb") as f:
             await f.write(image_byte.body)
 

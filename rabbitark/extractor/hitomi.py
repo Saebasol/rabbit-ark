@@ -7,7 +7,8 @@ from rabbitark.utils.default_class import Info
 
 
 class HitomiImageModel:
-    def __init__(self, width: int, hash_: str, haswebp: int, name: str, height: int):
+    def __init__(self, width: int, hash_: str, haswebp: int, name: str,
+                 height: int):
         self.width = int(width)
         self.hash_ = str(hash_)
         self.haswebp = bool(haswebp)
@@ -17,16 +18,16 @@ class HitomiImageModel:
 
 class HitomiGalleryInfoModel:
     def __init__(
-        self,
-        language_localname: str,
-        language: str,
-        date: str,
-        files: list,
-        tags: list,
-        japanese_title: str,
-        title: str,
-        galleryid: int,
-        type_: str,
+            self,
+            language_localname: str,
+            language: str,
+            date: str,
+            files: list,
+            tags: list,
+            japanese_title: str,
+            title: str,
+            galleryid: int,
+            type_: str,
     ):
         self.language_localname = language_localname
         self.language = language
@@ -43,17 +44,19 @@ class HitomiRequester(Requester):
     def __init__(self):
         super().__init__(
             headers={
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36",
+                "User-Agent":
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36",
                 "referer": "https://hitomi.la",
-            }
-        )
+            })
 
     async def get_galleryinfo(self, index):
-        response = await self.get(f"https://ltn.hitomi.la/galleries/{index}.js", "text")
+        response = await self.get(
+            f"https://ltn.hitomi.la/galleries/{index}.js", "text")
         js_to_json = response.body.replace("var galleryinfo = ", "")
         return parse_galleryinfo(json.loads(js_to_json))
 
-    async def images(self, index: int) -> tuple[list[Image], HitomiGalleryInfoModel]:
+    async def images(self,
+                     index: int) -> tuple[list[Image], HitomiGalleryInfoModel]:
         galleryinfomodel = await self.get_galleryinfo(index)
         if not galleryinfomodel:
             return None
@@ -115,15 +118,16 @@ def full_path_from_hash(hash_: str) -> str:
     if len(hash_) < 3:
         return hash_
 
-    result = hash_[len(hash_) - 3 :]
+    result = hash_[len(hash_) - 3:]
     a = result[0:2]
     b = result[-1]
     return f"{b}/{a}/" + hash_
 
 
-def url_from_hash(
-    galleryid: int, image: HitomiImageModel, dir_: str = None, ext: str = None
-) -> str:
+def url_from_hash(galleryid: int,
+                  image: HitomiImageModel,
+                  dir_: str = None,
+                  ext: str = None) -> str:
     e = image.name.split(".")[-1]
     if ext:
         e = ext
@@ -139,15 +143,17 @@ def url_from_hash(
     return "https://a.hitomi.la/" + d + "/" + r + "." + e
 
 
-def url_from_url_from_hash(
-    galleryid: int, image: HitomiImageModel, dir_: str = None, ext: str = None
-) -> str:
+def url_from_url_from_hash(galleryid: int,
+                           image: HitomiImageModel,
+                           dir_: str = None,
+                           ext: str = None) -> str:
     a = url_from_hash(galleryid, image, dir_, ext)
     b = url_from_url(a)
     return b
 
 
-def image_url_from_image(galleryid: int, image: HitomiImageModel, no_webp: bool) -> str:
+def image_url_from_image(galleryid: int, image: HitomiImageModel,
+                         no_webp: bool) -> str:
     webp = None
     if image.hash_ and image.haswebp and not no_webp:
         webp = "webp"
@@ -162,11 +168,20 @@ def parse_galleryinfo(galleryinfo_json: dict) -> HitomiGalleryInfoModel:
         parsed_tags = []
         for tag in galleryinfo_json["tags"]:
             if not tag.get("male") and tag.get("female"):
-                parsed_tags.append({"value": f"female:{tag['tag']}", "url": tag["url"]})
+                parsed_tags.append({
+                    "value": f"female:{tag['tag']}",
+                    "url": tag["url"]
+                })
             elif tag.get("male") and not tag.get("female"):
-                parsed_tags.append({"value": f"male:{tag['tag']}", "url": tag["url"]})
+                parsed_tags.append({
+                    "value": f"male:{tag['tag']}",
+                    "url": tag["url"]
+                })
             elif not tag.get("male") and not tag.get("female"):
-                parsed_tags.append({"value": f"tag:{tag['tag']}", "url": tag["url"]})
+                parsed_tags.append({
+                    "value": f"tag:{tag['tag']}",
+                    "url": tag["url"]
+                })
             elif tag.get("male") and tag.get("female"):
                 raise Exception
             else:
