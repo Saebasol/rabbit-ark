@@ -1,4 +1,5 @@
 import os
+
 from typing import Any
 from rabbitark.downloader.downloader import Downloader
 from rabbitark.utils.extractor_dict import extractor
