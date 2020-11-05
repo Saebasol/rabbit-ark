@@ -3,16 +3,25 @@ from rabbitark.utils.request import Requester
 from rabbitark.utils.default_class import Image, Info
 from rabbitark.utils.utils import get_urls, split, folder_name_checker
 from rabbitark.error import NotFound
+from rabbitark.config import config
 
 
 class PixivRequester(Requester):
     def __init__(self):
         super().__init__(
             headers={
+                "accept-encoding": "gzip, deflate, br",
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36",
                 "referer": "https://pixiv.net",
-            }
+                "sec-fetch-mode": "cors",
+                "sec-fetch-site": "same-origin",
+            },
+            cookies=config.COOKIES,
         )
+
+    # async def get_postkey(self):
+    #     r = await self.get("https://www.pixiv.net/", "text")
+    #     return re.findall(r'.*pixiv.context.token = "([a-z0-9]{32})"?.*', r.body)[0]
 
     async def get_illust_info(self, illust_id):
         info = await self.get(
@@ -42,7 +51,8 @@ class PixivRequester(Requester):
 
     async def get_user_all_illust(self, user_id):
         info = await self.get(
-            f"https://www.pixiv.net/ajax/user/{user_id}/profile/all", "json"
+            f"https://www.pixiv.net/ajax/user/{user_id}/profile/all",
+            "json",
         )
         return info.body["body"]["illusts"].keys()
 
@@ -54,11 +64,11 @@ class PixivRequester(Requester):
     async def checking_id(self, pixiv_id):
         illust = await self.get_illust_info(pixiv_id)
         if illust:
-            return self.single_images(pixiv_id)
+            return await self.single_images(pixiv_id)
 
         username = await self.get_user_info(pixiv_id)
         if username:
-            return self.user(pixiv_id)
+            return await self.user(pixiv_id)
 
         raise NotFound(pixiv_id)
 
