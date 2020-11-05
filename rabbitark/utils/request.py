@@ -4,24 +4,13 @@ import aiohttp
 
 
 class Requester:
-    def __init__(
-        self,
-        user_agent: Optional[str] = None,
-        referer: Optional[str] = None,
-        cookies: Optional[str] = None,
-    ):
-        self.referer = referer
-        self.user_agent = user_agent
-        self.cookies = cookies
+    def __init__(self, *args, **kwargs):
+        self.args = args
+        self.kwargs = kwargs
 
     @property
     def headers(self):
-        headers = {}
-        if self.referer:
-            headers.update({"referer": self.referer})
-        if self.user_agent:
-            headers.update({"User-Agent": self.user_agent})
-        return headers
+        return self.kwargs.get("headers")
 
     async def request(
         self,
@@ -32,9 +21,7 @@ class Requester:
         headers: Any = None,
         cookies: str = None,
     ) -> Response:
-        async with aiohttp.ClientSession(
-            headers=self.headers, cookies=self.cookies
-        ) as cs:
+        async with aiohttp.ClientSession(*self.args, **self.kwargs) as cs:
             async with cs.request(
                 method, url, headers=headers, json=json, cookies=cookies
             ) as response:
