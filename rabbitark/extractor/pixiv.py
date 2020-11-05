@@ -36,7 +36,7 @@ class PixivRequester(Requester):
 
     async def get_illust_urls(self, illust_id):
         info = await self.get(
-            f"https://www.pixiv.net/ajax/illust/{illust_id}/page",
+            f"https://www.pixiv.net/ajax/illust/{illust_id}/pages",
             "json",
         )
         return [page["urls"]["original"] for page in info.body["body"]]
