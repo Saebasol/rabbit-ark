@@ -1,5 +1,6 @@
-from aiomultiprocess import Pool
 from http.cookies import SimpleCookie
+
+from aiomultiprocess import Pool
 
 
 def split(url: str):
