@@ -6,7 +6,8 @@ from aiomultiprocess import Pool
 
 from rabbitark.config import config
 from rabbitark.utils import Requester
-from rabbitark.utils.default_class import DownloadInfo, Info
+from rabbitark.utils.default_class import DownloadInfo
+from rabbitark.utils.default_class import Info
 
 
 class Downloader(Requester):

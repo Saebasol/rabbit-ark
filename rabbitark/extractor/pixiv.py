@@ -1,9 +1,11 @@
 from typing import Any
 
 from rabbitark.error import NotFound
-from rabbitark.utils.default_class import Image, Info
+from rabbitark.utils.default_class import Image
+from rabbitark.utils.default_class import Info
 from rabbitark.utils.request import Requester
-from rabbitark.utils.utils import get_urls, split
+from rabbitark.utils.utils import get_urls
+from rabbitark.utils.utils import split
 
 
 class PixivRequester(Requester):
