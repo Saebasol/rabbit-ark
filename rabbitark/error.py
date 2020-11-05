@@ -1,8 +1,10 @@
 class RabbitArkException(Exception):
     pass
 
+
 class HTTPException(RabbitArkException):
     pass
+
 
 class NotFound(HTTPException):
     def __init__(self, arg):
