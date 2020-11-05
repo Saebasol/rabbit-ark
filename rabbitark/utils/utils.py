@@ -1,4 +1,9 @@
 from aiomultiprocess import Pool
+from http.cookies import SimpleCookie
+
+
+def split(url: str):
+    return url.rsplit("/", 1)[1]
 
 
 async def get_urls(func, arg: list) -> None:
@@ -11,3 +16,9 @@ async def get_urls(func, arg: list) -> None:
                 result.append(url)
 
     return result
+
+
+def load_cookie(rawdata):
+    cookie = SimpleCookie()
+    cookie.load(rawdata)
+    return {key: morsel.value for key, morsel in cookie.items()}
