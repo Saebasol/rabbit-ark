@@ -1,3 +1,4 @@
+import re
 from aiomultiprocess import Pool
 from http.cookies import SimpleCookie
 from http.cookiejar import MozillaCookieJar
