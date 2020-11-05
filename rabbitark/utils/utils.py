@@ -1,8 +1,8 @@
 import re
+from http.cookiejar import MozillaCookieJar
+from http.cookies import SimpleCookie
 
 from aiomultiprocess import Pool
-from http.cookies import SimpleCookie
-from http.cookiejar import MozillaCookieJar
 
 
 def split(url: str):
