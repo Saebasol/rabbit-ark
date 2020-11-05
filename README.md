@@ -2,11 +2,24 @@
 
 > Scalable downloader that downloads asynchronously
 
+- [Rabbit Ark](#rabbit-ark)
+  - [Description](#description)
+  - [Supported Sites](#supported-sites)
+  - [Script](#script)
+  - [Special Thanks](#special-thanks)
+
 ## Description
 
 This program is inspired by [YouTube-dl](https://github.com/ytdl-org/youtube-dl/) and [Hitomi Downloader](https://github.com/KurtBestor/Hitomi-Downloader)
 
 The download is processed using the [aiomultiprocess](https://github.com/omnilib/aiomultiprocess) module.
+
+## Supported Sites
+
+|     Site      | URL                 | Extractor release life cycle |
+| :-----------: | ------------------- | ---------------------------- |
+| **Hitomi.la** | <https://hitomi.la> | Alpha                        |
+|   **Pixiv**   | <https://pixiv.net> | Alpha                        |
 
 ## Script
 
