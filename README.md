@@ -20,6 +20,7 @@ The download is processed using the [aiomultiprocess](https://github.com/omnilib
 | :-----------: | ------------------- | ---------------------------- |
 | **Hitomi.la** | <https://hitomi.la> | Alpha                        |
 |   **Pixiv**   | <https://pixiv.net> | Alpha                        |
+| **Youtube.com**| <https://youtube.com> | Alpha|
 
 ## Script
 
