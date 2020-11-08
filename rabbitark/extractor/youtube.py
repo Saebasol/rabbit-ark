@@ -59,11 +59,11 @@ OTHER DEALINGS IN THE SOFTWARE.
 For more information, please refer to <http://unlicense.org/>
 """
 
-from rabbitark.utils.default_class import Image, Info
-from rabbitark.error import NotFound
-import re
 import json
+import re
 
+from rabbitark.error import NotFound
+from rabbitark.utils.default_class import Image, Info
 from rabbitark.utils.request import Requester
 
 VALID_URL = r"""(?x)^
