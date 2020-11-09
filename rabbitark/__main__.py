@@ -1,3 +1,5 @@
+import sys
+import multiprocessing
 import argparse
 import asyncio
 
@@ -5,8 +7,10 @@ from rabbitark.config import config
 from rabbitark.rabbitark import RabbitArk
 from rabbitark.utils.utils import load_cookie_txt
 
-parser = argparse.ArgumentParser("rabbitark")
+if getattr(sys, "frozen", False):
+    multiprocessing.freeze_support()
 
+parser = argparse.ArgumentParser("rabbitark")
 
 parser.add_argument("extractor", type=str, help="Specifies the extractor to use")
 
@@ -33,6 +37,5 @@ if not args.folder:
 if args.cookies:
     config.COOKIES = load_cookie_txt(args.cookies)
 
-if __name__ == "__main__":
-    ark = RabbitArk(args.extractor)
-    asyncio.run(ark.start(args.downloadable))
+ark = RabbitArk(args.extractor)
+asyncio.run(ark.start(args.downloadable))
