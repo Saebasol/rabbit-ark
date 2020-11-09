@@ -1,7 +1,7 @@
-import sys
-import multiprocessing
 import argparse
 import asyncio
+import multiprocessing
+import sys
 
 from rabbitark.config import config
 from rabbitark.rabbitark import RabbitArk
