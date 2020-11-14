@@ -43,11 +43,11 @@ For more information, check the -h argument.
 
 ## Supported Sites
 
-|     Site      | URL                 | Extractor release life cycle |
-| :-----------: | ------------------- | ---------------------------- |
-| **Hitomi.la** | <https://hitomi.la> | Alpha                        |
-|   **Pixiv**   | <https://pixiv.net> | Alpha                        |
-| **Youtube.com**| <https://youtube.com> | Alpha|
+|    Site     | URL                   | Extractor release life cycle |
+| :---------: | --------------------- | ---------------------------- |
+| **Hitomi**  | <https://hitomi.la>   | Alpha                        |
+|  **Pixiv**  | <https://pixiv.net>   | Alpha                        |
+| **Youtube** | <https://youtube.com> | Alpha                        |
 
 ## Script
 
