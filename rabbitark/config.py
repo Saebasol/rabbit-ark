@@ -1,10 +1,13 @@
+from typing import Any, List, Dict, Optional
+
+
 class _Config:
-    __slots__ = ["BASE_DIRECTORY", "FOLDER", "COOKIES"]
+    __slots__: List[str] = ["BASE_DIRECTORY", "FOLDER", "COOKIES"]
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.BASE_DIRECTORY: str = "."
-        self.FOLDER: str = None
-        self.COOKIES: str = {}
+        self.FOLDER: Optional[str] = None
+        self.COOKIES: Dict[str, Any] = {}
 
 
-config = _Config()
+config: _Config = _Config()

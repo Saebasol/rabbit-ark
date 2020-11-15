@@ -1,5 +1,6 @@
 import json
 import re
+from typing import List, Optional, Tuple
 
 from rabbitark.utils import Requester
 from rabbitark.utils.default_class import Image, Info
@@ -17,15 +18,15 @@ class HitomiImageModel:
 class HitomiGalleryInfoModel:
     def __init__(
         self,
-        language_localname: str,
-        language: str,
-        date: str,
-        files: list,
-        tags: list,
-        japanese_title: str,
-        title: str,
-        galleryid: int,
-        type_: str,
+        language_localname: Optional[str],
+        language: Optional[str],
+        date: Optional[str],
+        files: Optional[List],
+        tags: Optional[List],
+        japanese_title: Optional[str],
+        title: Optional[str],
+        galleryid: Optional[int],
+        type_: Optional[str],
     ):
         self.language_localname = language_localname
         self.language = language
@@ -52,7 +53,9 @@ class HitomiRequester(Requester):
         js_to_json = response.body.replace("var galleryinfo = ", "")
         return parse_galleryinfo(json.loads(js_to_json))
 
-    async def images(self, index: int) -> tuple[list[Image], HitomiGalleryInfoModel]:
+    async def images(
+        self, index: int
+    ) -> Optional[Tuple[List[Image], HitomiGalleryInfoModel]]:
         galleryinfomodel = await self.get_galleryinfo(index)
         if not galleryinfomodel:
             return None
@@ -67,9 +70,15 @@ class Hitomi(HitomiRequester):
     def __init__(self) -> None:
         super().__init__()
 
-    async def download_info(self, index) -> Info:
-        images, model = await self.images(index)
-        return Info(images, model.galleryid, self.headers)
+    async def download_info(self, index: int) -> Optional[Info]:
+        Images: Optional[
+            Tuple[List[Image], HitomiGalleryInfoModel]
+        ] = await self.images(index)
+
+        if not Images:
+            return None
+
+        return Info(Images[0], Images[1].galleryid, self.headers)
 
     async def multiple_download_info(self, index_list: list):
         for index in index_list:
@@ -82,7 +91,7 @@ def subdomain_from_galleryid(g: int, number_of_frontends: int) -> str:
     return r
 
 
-def subdomain_from_url(url: str) -> str:
+def subdomain_from_url(url: str) -> Optional[str]:
     retval = "b"
 
     number_of_frontends = 3
@@ -90,6 +99,9 @@ def subdomain_from_url(url: str) -> str:
 
     r = re.compile(r"\/[0-9a-f]\/([0-9a-f]{2})\/")
     m = r.search(url)
+
+    if not m:
+        return None
 
     g = int(m[1], b)
 
@@ -156,7 +168,7 @@ def image_url_from_image(galleryid: int, image: HitomiImageModel, no_webp: bool)
 
 def parse_galleryinfo(galleryinfo_json: dict) -> HitomiGalleryInfoModel:
     if not galleryinfo_json["tags"]:
-        parsed_tags = []
+        parsed_tags: List = []
     else:
         parsed_tags = []
         for tag in galleryinfo_json["tags"]:

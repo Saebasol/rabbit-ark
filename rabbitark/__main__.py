@@ -10,7 +10,7 @@ from rabbitark.utils.utils import load_cookie_txt
 if getattr(sys, "frozen", False):
     multiprocessing.freeze_support()
 
-parser = argparse.ArgumentParser("rabbitark")
+parser: argparse.ArgumentParser = argparse.ArgumentParser("rabbitark")
 
 parser.add_argument("extractor", type=str, help="Specifies the extractor to use")
 
@@ -26,7 +26,7 @@ parser.add_argument("--folder", type=str, help="")
 
 parser.add_argument("--cookies", type=str, help="load cookies.txt")
 
-args = parser.parse_args()
+args: argparse.Namespace = parser.parse_args()
 
 if args.base:
     config.BASE_DIRECTORY = args.folder
@@ -37,5 +37,4 @@ if not args.folder:
 if args.cookies:
     config.COOKIES = load_cookie_txt(args.cookies)
 
-ark = RabbitArk(args.extractor)
-asyncio.run(ark.start(args.downloadable))
+asyncio.run(RabbitArk(args.extractor).start(args.downloadable))

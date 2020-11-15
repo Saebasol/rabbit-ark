@@ -61,12 +61,13 @@ For more information, please refer to <http://unlicense.org/>
 
 import json
 import re
+from typing import Any, Dict, List, Match, Optional, Pattern
 
 from rabbitark.error import NotFound
-from rabbitark.utils.default_class import Image, Info
+from rabbitark.utils.default_class import Image, Info, Response
 from rabbitark.utils.request import Requester
 
-VALID_URL = r"""(?x)^
+VALID_URL: str = r"""(?x)^
                      (
                          (?:https?://|//)                                    # http(s):// or protocol-independent URL
                          (?:(?:(?:(?:\w+\.)?[yY][oO][uU][tT][uU][bB][eE](?:-nocookie|kids)?\.com/|
@@ -132,7 +133,7 @@ VALID_URL = r"""(?x)^
                      (?(1).+)?                                                # if we found the ID, everything can follow
                      $"""
 
-PLAYLIST_VALID_URL = r"""(?x)(?:
+PLAYLIST_VALID_URL: str = r"""(?x)(?:
                     (?:https?://)?
                     (?:\w+\.)?
                     (?:
@@ -159,11 +160,11 @@ PLAYLIST_VALID_URL = r"""(?x)(?:
                     )"""
 
 
-DATA_JSON = re.compile(
+DATA_JSON: Pattern = re.compile(
     r"(?:window\[\"ytInitialData\"\]|var ytInitialData)\s*=\s*(\{.*\})"
 )
 
-PLAYLIST_PREFIX_LIST = [
+PLAYLIST_PREFIX_LIST: List[str] = [
     "PL",
     "LL",
     "EC",
@@ -186,29 +187,29 @@ class YoutubeRequester(Requester):
             }
         )
 
-    async def extract_playlist(self, playlist_id: str) -> dict:
+    async def extract_playlist(self, playlist_id: str) -> List[Dict[str, Any]]:
         if playlist_id.startswith(("RD", "UL", "PU")):
             raise TypeError("playlistId is Youtube Mix id")
 
-        body = await self.get(
+        body: Response = await self.get(
             f"https://www.youtube.com/playlist",
             "text",
             params={"list": playlist_id, "hl": "en"},
         )
 
-        search = DATA_JSON.search(body.body)
+        search: Optional[Match] = DATA_JSON.search(body.body)
 
         if not search:
             raise ValueError
 
-        Data: dict = json.loads(search.group(1))
+        Data: Dict[str, Any] = json.loads(search.group(1))
 
         if Data.get("alerts"):
             raise Exception(Data["alerts"][0]["alertRenderer"]["text"]["simpleText"])
 
-        firstPlaylistData: list = Data["contents"]["twoColumnBrowseResultsRenderer"][
-            "tabs"
-        ][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][0][
+        firstPlaylistData: Dict[str, Any] = Data["contents"][
+            "twoColumnBrowseResultsRenderer"
+        ]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][0][
             "itemSectionRenderer"
         ][
             "contents"
@@ -218,22 +219,24 @@ class YoutubeRequester(Requester):
             "playlistVideoListRenderer"
         ]
 
-        Sources: list = []
+        Sources: List = []
 
-        def extract_playlist(playlistData: dict, name: str = "contents") -> str:
-            trackList: list = playlistData.get(name)
+        def extract_playlist(
+            playlistData: Dict, name: str = "contents"
+        ) -> Optional[str]:
+            trackList: Optional[List[Any]] = playlistData.get(name)
             if not trackList:
-                return
+                return None
 
             continuationsTokens: list = []
 
-            def extract(Track: dict) -> dict:
+            def extract(Track: dict) -> Optional[dict]:
                 if "playlistVideoRenderer" in Track:
-                    renderer: dict = Track.get("playlistVideoRenderer", {})
-                    shortBylineText: dict = renderer.get("shortBylineText")
+                    renderer: Dict = Track.get("playlistVideoRenderer", {})
+                    shortBylineText: Optional[Dict] = renderer.get("shortBylineText")
 
                     if not renderer.get("isPlayable") or not shortBylineText:
-                        return
+                        return None
 
                     return {
                         "id": renderer["videoId"],
@@ -251,14 +254,14 @@ class YoutubeRequester(Requester):
                         ]["token"]
                     )
 
-                    return
+                    return None
                 else:
-                    return
+                    return None
 
             Sources.extend(map(extract, trackList))
 
             if not continuationsTokens:
-                return
+                return None
 
             return (
                 "https://www.youtube.com/browse_ajax?continuation="
@@ -268,18 +271,18 @@ class YoutubeRequester(Requester):
                 + "&hl=en"
             )
 
-        continuations_url: str = extract_playlist(firstPlaylistData)
+        continuations_url: Optional[str] = extract_playlist(firstPlaylistData)
         for _ in range(6):
             if not continuations_url:
                 break
 
             body = await self.get(continuations_url, "json")
 
-            nextPlaylistData: dict = body[1]["response"]["onResponseReceivedActions"][
-                0
-            ]["appendContinuationItemsAction"]
+            nextPlaylistData: Dict = body.body[1]["response"][
+                "onResponseReceivedActions"
+            ][0]["appendContinuationItemsAction"]
 
-            continuations_url: str = extract_playlist(
+            continuations_url = extract_playlist(
                 nextPlaylistData, name="continuationItems"
             )
 
