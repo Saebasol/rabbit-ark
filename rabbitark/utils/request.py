@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import aiohttp
 
@@ -6,12 +6,12 @@ from rabbitark.utils.default_class import Response
 
 
 class Requester:
-    def __init__(self, *args, **kwargs):
-        self.args = args
-        self.kwargs = kwargs
+    def __init__(self, *args, **kwargs) -> None:
+        self.args: Tuple = args
+        self.kwargs: Dict[str, Any] = kwargs
 
     @property
-    def headers(self):
+    def headers(self) -> Optional[Dict[str, str]]:
         return self.kwargs.get("headers")
 
     async def request(
@@ -19,7 +19,7 @@ class Requester:
     ) -> Response:
         async with aiohttp.ClientSession(*self.args, **self.kwargs) as cs:
             async with cs.request(method, url, *args, **kwargs) as response:
-                dispatch = {
+                dispatch: Dict[str, Any] = {
                     "json": response.json,
                     "read": response.read,
                     "text": response.text,

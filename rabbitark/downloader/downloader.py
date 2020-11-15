@@ -1,19 +1,20 @@
 import os
+from typing import Generator, List, Optional, Union
 
 import aiofiles
-import aiofiles.os as aioos
-from aiomultiprocess import Pool
+import aiofiles.os as aioos  # type: ignore
+from aiomultiprocess import Pool  # type: ignore
 
 from rabbitark.config import config
 from rabbitark.utils import Requester
-from rabbitark.utils.default_class import DownloadInfo, Info
+from rabbitark.utils.default_class import DownloadInfo, Info, Response
 
 
 class Downloader(Requester):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
-        self.base_directory = config.BASE_DIRECTORY
-        self.folder = config.FOLDER
+        self.base_directory: str = config.BASE_DIRECTORY
+        self.folder: Optional[str] = config.FOLDER
 
     async def create_folder(self, title=None) -> None:
         if not os.path.exists(f"{self.base_directory}/{self.folder}"):
@@ -23,15 +24,13 @@ class Downloader(Requester):
             if not os.path.exists(f"{self.base_directory}/{self.folder}/{title}"):
                 await aioos.mkdir(f"{self.base_directory}/{self.folder}/{title}")
 
-    def check_folder(self, title: str, filename: str) -> str:
+    def check_folder(self, title: Optional[str], filename: Optional[str]) -> str:
         if title:
-            directory = f"{self.base_directory}/{self.folder}/{title}/{filename}"
+            return f"{self.base_directory}/{self.folder}/{title}/{filename}"
         else:
-            directory = f"{self.base_directory}/{self.folder}/{filename}"
+            return f"{self.base_directory}/{self.folder}/{filename}"
 
-        return directory
-
-    def download_info_generator(self, info: Info) -> DownloadInfo:
+    def download_info_generator(self, info: Info) -> Generator:
         for image in info.image:
             yield DownloadInfo(
                 image.url,
@@ -39,7 +38,7 @@ class Downloader(Requester):
                 info.headers if info.headers else {},
             )
 
-    def checking_image_object(self, info: Info) -> DownloadInfo:
+    def checking_image_object(self, info: Info) -> Union[Generator, List[DownloadInfo]]:
         if isinstance(info.image, list):
             return self.download_info_generator(info)
         else:
@@ -52,18 +51,22 @@ class Downloader(Requester):
             ]
 
     async def download(self, download_info: DownloadInfo) -> None:
-        image_byte = await self.get(download_info.url, headers=download_info.headers)
-        async with aiofiles.open(download_info.directory, mode="wb") as f:
+        image_byte: Response = await self.get(
+            download_info.url, headers=download_info.headers
+        )
+        async with aiofiles.open(download_info.directory, mode="wb") as f:  # type: ignore
             await f.write(image_byte.body)
 
     async def start_download(self, info: Info) -> None:
-        download_info = self.checking_image_object(info)
+        download_info: Union[
+            Generator, List[DownloadInfo]
+        ] = self.checking_image_object(info)
         await self.create_folder(info.title)
         async with Pool() as pool:
             async for _ in pool.map(self.download, download_info):
                 pass
 
-    async def start_multiple_download(self, info_list: list[Info]) -> None:
+    async def start_multiple_download(self, info_list: List[Info]) -> None:
         async with Pool() as pool:
             async for _ in pool.map(self.start_download, info_list):
                 pass

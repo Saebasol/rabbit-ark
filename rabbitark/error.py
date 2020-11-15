@@ -7,10 +7,10 @@ class HTTPException(RabbitArkException):
 
 
 class NotFound(HTTPException):
-    def __init__(self, arg):
+    def __init__(self, arg: str) -> None:
         super().__init__(f"Can't found '{arg}'")
 
 
 class ExtractorNotFound(RabbitArkException):
-    def __init__(self, option):
+    def __init__(self, option: str) -> None:
         super().__init__(f"Can't found '{option}'")
