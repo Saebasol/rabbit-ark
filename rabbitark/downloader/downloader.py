@@ -4,9 +4,9 @@ import aiofiles
 import aiofiles.os as aioos
 from aiomultiprocess import Pool
 
-from rabbitark.config import config
-from rabbitark.utils import Requester
-from rabbitark.utils.default_class import DownloadInfo, Info
+from ..config import config
+from ..utils import Requester
+from ..utils.default_class import DownloadInfo, Info
 
 
 class Downloader(Requester):

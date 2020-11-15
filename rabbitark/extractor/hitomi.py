@@ -1,8 +1,8 @@
 import json
 import re
 
-from rabbitark.utils import Requester
-from rabbitark.utils.default_class import Image, Info
+from ..utils import Requester
+from ..utils.default_class import Image, Info
 
 
 class HitomiImageModel:

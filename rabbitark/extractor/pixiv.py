@@ -1,10 +1,10 @@
 from typing import Any
 
-from rabbitark.config import config
-from rabbitark.error import NotFound
-from rabbitark.utils.default_class import Image, Info
-from rabbitark.utils.request import Requester
-from rabbitark.utils.utils import folder_name_checker, get_urls, split
+from ..config import config
+from ..error import NotFound
+from ..utils.default_class import Image, Info
+from ..utils.request import Requester
+from ..utils.utils import folder_name_checker, get_urls, split
 
 
 class PixivRequester(Requester):

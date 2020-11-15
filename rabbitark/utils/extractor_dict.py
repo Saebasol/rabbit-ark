@@ -1,3 +1,3 @@
-from rabbitark.extractor import Hitomi, Pixiv
+from ..extractor import Hitomi, Pixiv
 
 extractor = {"hitomi": Hitomi, "pixiv": Pixiv}

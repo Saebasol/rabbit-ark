@@ -1,9 +1,9 @@
 import argparse
 import asyncio
 
-from rabbitark.config import config
-from rabbitark.rabbitark import RabbitArk
-from rabbitark.utils.utils import load_cookie_txt
+from .config import config
+from .rabbitark import RabbitArk
+from .utils.utils import load_cookie_txt
 
 parser = argparse.ArgumentParser("rabbitark")
 

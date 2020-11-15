@@ -1,8 +1,6 @@
-from typing import Any, Optional
-
 import aiohttp
 
-from rabbitark.utils.default_class import Response
+from ..utils.default_class import Response
 
 
 class Requester:
