@@ -24,7 +24,7 @@ You can Download in [here](https://github.com/Saebasol/rabbit-ark/releases)
 
 ### How to use
 
-First you shoud specify which extractor to use
+First you should specify which extractor to use
 
 ```sh
 rabbitark pixiv
