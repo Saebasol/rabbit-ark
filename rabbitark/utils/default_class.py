@@ -32,3 +32,13 @@ class Response:
         self.status: int = status
         self.message: Optional[Any] = message
         self.body: Any = body
+
+
+class RabbitArkABC(metaclass=abc.ABCMeta):
+    @abstractmethod
+    async def extractor_download(self):
+        pass
+
+    @abstractmethod
+    async def extractor_multiple_download(self):
+        pass
