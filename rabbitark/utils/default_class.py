@@ -36,9 +36,9 @@ class Response:
 
 class RabbitArkABC(metaclass=abc.ABCMeta):
     @abstractmethod
-    async def extractor_download(self):
+    async def extractor_download(self, downloadable) -> DownloadInfo:
         pass
 
     @abstractmethod
-    async def extractor_multiple_download(self):
+    async def extractor_multiple_download(self, downloadable) -> List[DownloadInfo]:
         pass
