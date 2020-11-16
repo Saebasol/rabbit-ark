@@ -63,11 +63,11 @@ import json
 import re
 from typing import Any, Dict, List, Match, Optional, Pattern
 
-from rabbitark.rabbitark import RabbitArk
-from rabbitark.error import NotFound
-from rabbitark.utils.default_class import Image, DownloadInfo, Response
-from rabbitark.utils.request import Requester
 from rabbitark.config import config
+from rabbitark.error import NotFound
+from rabbitark.rabbitark import RabbitArk
+from rabbitark.utils.default_class import DownloadInfo, Image, Response
+from rabbitark.utils.request import Requester
 
 VALID_URL: str = r"""(?x)^
                      (

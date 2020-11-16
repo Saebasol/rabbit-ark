@@ -1,6 +1,6 @@
 import os
-from typing import Generator, List, Optional, Union
 from functools import wraps
+from typing import Generator, List, Optional, Union
 
 import aiofiles
 import aiofiles.os as aioos  # type: ignore
@@ -8,7 +8,7 @@ from aiomultiprocess import Pool  # type: ignore
 
 from rabbitark.config import config
 from rabbitark.utils import Requester
-from rabbitark.utils.default_class import RequestInfo, DownloadInfo, Response
+from rabbitark.utils.default_class import DownloadInfo, RequestInfo, Response
 
 
 class Downloader(Requester):

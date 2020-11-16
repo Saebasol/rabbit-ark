@@ -1,6 +1,6 @@
+import abc
 from abc import abstractmethod
 from typing import Any, List, Optional, Union
-import abc
 
 from rabbitark.utils.utils import split
 

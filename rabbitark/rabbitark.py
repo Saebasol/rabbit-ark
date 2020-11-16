@@ -1,12 +1,11 @@
 import os
-from rabbitark.config import config
 from typing import Any, List
 
+from rabbitark.config import config
 from rabbitark.downloader.downloader import Downloader
 from rabbitark.error import ExtractorNotFound
-from rabbitark.utils.default_class import DownloadInfo
+from rabbitark.utils.default_class import DownloadInfo, RabbitArkABC
 from rabbitark.utils.load_dynamic_module import import_dynamic_module
-from rabbitark.utils.default_class import RabbitArkABC
 
 
 class RabbitArk(
