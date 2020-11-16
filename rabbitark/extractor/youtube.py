@@ -64,7 +64,7 @@ import re
 from typing import Any, Dict, List, Match, Optional, Pattern
 
 from rabbitark.error import NotFound
-from rabbitark.utils.default_class import Image, Info, Response
+from rabbitark.utils.default_class import Image, DownloadInfo, Response
 from rabbitark.utils.request import Requester
 
 VALID_URL: str = r"""(?x)^
@@ -319,11 +319,11 @@ class YoutubeRequester(Requester):
         )
 
     def make_info_video(self, video_id):
-        return Info(self.get_thumbnail(video_id), video_id)
+        return DownloadInfo(self.get_thumbnail(video_id), video_id)
 
     async def make_info_playlist(self, playlist_id):
         video_infos = await self.extract_playlist(playlist_id)
-        return Info(
+        return DownloadInfo(
             [self.get_thumbnail(info["id"]) for info in video_infos],
             playlist_id,
         )
@@ -333,7 +333,7 @@ class Youtube(YoutubeRequester):
     def __init__(self):
         super().__init__()
 
-    async def download_info(self, downloadable) -> Info:
+    async def extractor_download(self, downloadable) -> DownloadInfo:
         first_check = await self.checking_url(downloadable)
         if first_check:
             return first_check

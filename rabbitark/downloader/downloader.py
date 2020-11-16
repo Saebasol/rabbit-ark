@@ -7,7 +7,7 @@ from aiomultiprocess import Pool  # type: ignore
 
 from rabbitark.config import config
 from rabbitark.utils import Requester
-from rabbitark.utils.default_class import DownloadInfo, Info, Response
+from rabbitark.utils.default_class import RequestInfo, DownloadInfo, Response
 
 
 class Downloader(Requester):
@@ -30,43 +30,43 @@ class Downloader(Requester):
         else:
             return f"{self.base_directory}/{self.folder}/{filename}"
 
-    def download_info_generator(self, info: Info) -> Generator:
+    def download_info_generator(self, info: DownloadInfo) -> Generator:
         for image in info.image:
-            yield DownloadInfo(
+            yield RequestInfo(
                 image.url,
                 self.check_folder(info.title, image.filename),
                 info.headers if info.headers else {},
             )
 
-    def checking_image_object(self, info: Info) -> Union[Generator, List[DownloadInfo]]:
+    def checking_image_object(self, info: DownloadInfo) -> Union[Generator, List[RequestInfo]]:
         if isinstance(info.image, list):
             return self.download_info_generator(info)
         else:
             return [
-                DownloadInfo(
+                RequestInfo(
                     info.image.url,
                     self.check_folder(info.title, info.image.filename),
                     info.headers if info.headers else {},
                 )
             ]
 
-    async def download(self, download_info: DownloadInfo) -> None:
+    async def download(self, download_info: RequestInfo) -> None:
         image_byte: Response = await self.get(
             download_info.url, headers=download_info.headers
         )
         async with aiofiles.open(download_info.directory, mode="wb") as f:  # type: ignore
             await f.write(image_byte.body)
 
-    async def start_download(self, info: Info) -> None:
+    async def start_download(self, info: DownloadInfo) -> None:
         download_info: Union[
-            Generator, List[DownloadInfo]
+            Generator, List[RequestInfo]
         ] = self.checking_image_object(info)
         await self.create_folder(info.title)
         async with Pool() as pool:
             async for _ in pool.map(self.download, download_info):
                 pass
 
-    async def start_multiple_download(self, info_list: List[Info]) -> None:
+    async def start_multiple_download(self, info_list: List[DownloadInfo]) -> None:
         async with Pool() as pool:
             async for _ in pool.map(self.start_download, info_list):
                 pass

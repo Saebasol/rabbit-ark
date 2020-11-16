@@ -1,4 +1,6 @@
+from abc import abstractmethod
 from typing import Any, List, Optional, Union
+import abc
 
 from rabbitark.utils.utils import split
 
@@ -9,7 +11,7 @@ class Image:
         self.filename: str = filename if filename else split(url)
 
 
-class Info:
+class DownloadInfo:
     def __init__(
         self, image: List[Image], title: Optional[Any] = None, headers: Any = None
     ) -> None:
@@ -18,7 +20,7 @@ class Info:
         self.headers: Any = headers
 
 
-class DownloadInfo:
+class RequestInfo:
     def __init__(self, url: str, directory: str, headers: Any = None) -> None:
         self.url: str = url
         self.directory: str = directory
