@@ -1,11 +1,11 @@
 import os
 from typing import Any, List
 
-from .downloader.downloader import Downloader
-from .error import ExtractorNotFound
-from .utils.default_class import Info
-from .utils.extractor_dict import extractor
-from .utils.load_dynamic_module import load_extensions
+from rabbitark.downloader.downloader import Downloader
+from rabbitark.error import ExtractorNotFound
+from rabbitark.utils.default_class import Info
+from rabbitark.utils.extractor_dict import extractor
+from rabbitark.utils.load_dynamic_module import load_extensions
 
 
 class RabbitArk(Downloader):
