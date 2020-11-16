@@ -1,5 +1,6 @@
 import os
 from typing import Generator, List, Optional, Union
+from functools import wraps
 
 import aiofiles
 import aiofiles.os as aioos  # type: ignore
@@ -38,7 +39,9 @@ class Downloader(Requester):
                 info.headers if info.headers else {},
             )
 
-    def checking_image_object(self, info: DownloadInfo) -> Union[Generator, List[RequestInfo]]:
+    def checking_image_object(
+        self, info: DownloadInfo
+    ) -> Union[Generator, List[RequestInfo]]:
         if isinstance(info.image, list):
             return self.download_info_generator(info)
         else:
@@ -58,9 +61,9 @@ class Downloader(Requester):
             await f.write(image_byte.body)
 
     async def start_download(self, info: DownloadInfo) -> None:
-        download_info: Union[
-            Generator, List[RequestInfo]
-        ] = self.checking_image_object(info)
+        download_info: Union[Generator, List[RequestInfo]] = self.checking_image_object(
+            info
+        )
         await self.create_folder(info.title)
         async with Pool() as pool:
             async for _ in pool.map(self.download, download_info):
