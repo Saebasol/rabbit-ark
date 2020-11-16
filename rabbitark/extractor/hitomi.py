@@ -2,8 +2,9 @@ import json
 import re
 from typing import List, Optional, Tuple
 
+from rabbitark.rabbitark import RabbitArk
 from rabbitark.utils import Requester
-from rabbitark.utils.default_class import Image, Info
+from rabbitark.utils.default_class import DownloadInfo, Image
 
 
 class HitomiImageModel:
@@ -66,23 +67,24 @@ class HitomiRequester(Requester):
         return images, galleryinfomodel
 
 
+@RabbitArk.register("hitomi")
 class Hitomi(HitomiRequester):
     def __init__(self) -> None:
         super().__init__()
 
-    async def download_info(self, index: int) -> Optional[Info]:
-        Images: Optional[
+    async def extractor_download(self, index: int) -> Optional[DownloadInfo]:
+        images: Optional[
             Tuple[List[Image], HitomiGalleryInfoModel]
         ] = await self.images(index)
 
-        if not Images:
+        if not images:
             return None
 
-        return Info(Images[0], Images[1].galleryid, self.headers)
+        return DownloadInfo(images[0], images[1].galleryid, self.headers)
 
-    async def multiple_download_info(self, index_list: list):
+    async def extractor_multiple_download(self, index_list: list):
         for index in index_list:
-            yield self.download_info(index)
+            yield self.extractor_download(index)
 
 
 def subdomain_from_galleryid(g: int, number_of_frontends: int) -> str:

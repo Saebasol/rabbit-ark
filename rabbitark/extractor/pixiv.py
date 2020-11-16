@@ -2,7 +2,8 @@ from typing import Any
 
 from rabbitark.config import config
 from rabbitark.error import NotFound
-from rabbitark.utils.default_class import Image, Info
+from rabbitark.rabbitark import RabbitArk
+from rabbitark.utils.default_class import DownloadInfo, Image
 from rabbitark.utils.request import Requester
 from rabbitark.utils.utils import folder_name_checker, get_urls, split
 
@@ -78,7 +79,7 @@ class PixivRequester(Requester):
         if not info:
             return
         urls = await self.get_illust_urls(illust_id)
-        return Info(
+        return DownloadInfo(
             [Image(url) for url in urls],
             folder_name_checker(info["body"]["title"]),
             self.headers,
@@ -89,18 +90,19 @@ class PixivRequester(Requester):
         if not username:
             return
         url_list = await self.user_images(user_id)
-        return Info(
+        return DownloadInfo(
             [Image(url) for url in url_list],
             folder_name_checker(username),
             self.headers,
         )
 
 
+@RabbitArk.register("pixiv")
 class Pixiv(PixivRequester):
     def __init__(self):
         super().__init__()
 
-    async def download_info(self, downloadable: Any) -> Info:
+    async def extractor_download(self, downloadable: Any) -> DownloadInfo:
         if downloadable.isdigit():
             info = await self.checking_id(downloadable)
         else:

@@ -4,6 +4,7 @@ import multiprocessing
 import sys
 
 from rabbitark.config import config
+from rabbitark.extractor import load
 from rabbitark.rabbitark import RabbitArk
 from rabbitark.utils.utils import load_cookie_txt
 
@@ -12,7 +13,7 @@ if getattr(sys, "frozen", False):
 
 parser: argparse.ArgumentParser = argparse.ArgumentParser("rabbitark")
 
-parser.add_argument("extractor", type=str, help="Specifies the extractor to use")
+parser.add_argument("extractor", type=str, help="Specifies the extractor name")
 
 parser.add_argument(
     "--downloadable",
@@ -22,9 +23,13 @@ parser.add_argument(
 
 parser.add_argument("--base", type=str, help="Specifies the pre-created folder")
 
-parser.add_argument("--folder", type=str, help="")
+parser.add_argument("--folder", type=str, help="Specifies the folder name")
 
 parser.add_argument("--cookies", type=str, help="load cookies.txt")
+
+parser.add_argument("--page", type=int, help="Youtube page limit")
+
+parser.add_argument("--custom_extractor", type=str, help="use custom extractor")
 
 args: argparse.Namespace = parser.parse_args()
 
@@ -37,4 +42,11 @@ if not args.folder:
 if args.cookies:
     config.COOKIES = load_cookie_txt(args.cookies)
 
+if args.page:
+    config.YOUTUBE_PAGE_LIMIT = args.page
+
+if args.custom_extractor:
+    config.CUSTOM_EXTRACTOR = args.custom_extractor
+
+load()
 asyncio.run(RabbitArk(args.extractor).start(args.downloadable))

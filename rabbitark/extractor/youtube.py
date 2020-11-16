@@ -63,8 +63,10 @@ import json
 import re
 from typing import Any, Dict, List, Match, Optional, Pattern
 
+from rabbitark.config import config
 from rabbitark.error import NotFound
-from rabbitark.utils.default_class import Image, Info, Response
+from rabbitark.rabbitark import RabbitArk
+from rabbitark.utils.default_class import DownloadInfo, Image, Response
 from rabbitark.utils.request import Requester
 
 VALID_URL: str = r"""(?x)^
@@ -191,23 +193,23 @@ class YoutubeRequester(Requester):
         if playlist_id.startswith(("RD", "UL", "PU")):
             raise TypeError("playlistId is Youtube Mix id")
 
-        body: Response = await self.get(
+        response: Response = await self.get(
             f"https://www.youtube.com/playlist",
             "text",
             params={"list": playlist_id, "hl": "en"},
         )
 
-        search: Optional[Match] = DATA_JSON.search(body.body)
+        search: Optional[Match] = DATA_JSON.search(response.body)
 
         if not search:
             raise ValueError
 
-        Data: Dict[str, Any] = json.loads(search.group(1))
+        data: Dict[str, Any] = json.loads(search.group(1))
 
-        if Data.get("alerts"):
-            raise Exception(Data["alerts"][0]["alertRenderer"]["text"]["simpleText"])
+        if data.get("alerts"):
+            raise Exception(data["alerts"][0]["alertRenderer"]["text"]["simpleText"])
 
-        firstPlaylistData: Dict[str, Any] = Data["contents"][
+        firstPlaylistData: Dict[str, Any] = data["contents"][
             "twoColumnBrowseResultsRenderer"
         ]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][0][
             "itemSectionRenderer"
@@ -272,7 +274,7 @@ class YoutubeRequester(Requester):
             )
 
         continuations_url: Optional[str] = extract_playlist(firstPlaylistData)
-        for _ in range(6):
+        for _ in range(config.YOUTUBE_PAGE_LIMIT):
             if not continuations_url:
                 break
 
@@ -308,7 +310,8 @@ class YoutubeRequester(Requester):
                 if yt_id.startswith(prefix):
                     return await self.make_info_playlist(yt_id)
 
-            return
+            else:
+                return
 
         return self.make_info_video(yt_id)
 
@@ -319,27 +322,28 @@ class YoutubeRequester(Requester):
         )
 
     def make_info_video(self, video_id):
-        return Info(self.get_thumbnail(video_id), video_id)
+        return DownloadInfo(self.get_thumbnail(video_id), video_id)
 
     async def make_info_playlist(self, playlist_id):
         video_infos = await self.extract_playlist(playlist_id)
-        return Info(
+        return DownloadInfo(
             [self.get_thumbnail(info["id"]) for info in video_infos],
             playlist_id,
         )
 
 
+@RabbitArk.register("youtube")
 class Youtube(YoutubeRequester):
     def __init__(self):
         super().__init__()
 
-    async def download_info(self, downloadable) -> Info:
-        first_check = await self.checking_url(downloadable)
-        if first_check:
-            return first_check
+    async def extractor_download(self, downloadable) -> DownloadInfo:
+        checking_with_url = await self.checking_url(downloadable)
+        if checking_with_url:
+            return checking_with_url
 
-        second_check = await self.checking_id(downloadable)
-        if second_check:
-            return second_check
+        cheking_with_yt_id = await self.checking_id(downloadable)
+        if cheking_with_yt_id:
+            return cheking_with_yt_id
 
         raise NotFound(downloadable)
