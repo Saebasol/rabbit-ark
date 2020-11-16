@@ -192,23 +192,23 @@ class YoutubeRequester(Requester):
         if playlist_id.startswith(("RD", "UL", "PU")):
             raise TypeError("playlistId is Youtube Mix id")
 
-        body: Response = await self.get(
+        response: Response = await self.get(
             f"https://www.youtube.com/playlist",
             "text",
             params={"list": playlist_id, "hl": "en"},
         )
 
-        search: Optional[Match] = DATA_JSON.search(body.body)
+        search: Optional[Match] = DATA_JSON.search(response.body)
 
         if not search:
             raise ValueError
 
-        Data: Dict[str, Any] = json.loads(search.group(1))
+        data: Dict[str, Any] = json.loads(search.group(1))
 
-        if Data.get("alerts"):
-            raise Exception(Data["alerts"][0]["alertRenderer"]["text"]["simpleText"])
+        if data.get("alerts"):
+            raise Exception(data["alerts"][0]["alertRenderer"]["text"]["simpleText"])
 
-        firstPlaylistData: Dict[str, Any] = Data["contents"][
+        firstPlaylistData: Dict[str, Any] = data["contents"][
             "twoColumnBrowseResultsRenderer"
         ]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][0][
             "itemSectionRenderer"
@@ -336,12 +336,12 @@ class Youtube(YoutubeRequester):
         super().__init__()
 
     async def extractor_download(self, downloadable) -> DownloadInfo:
-        first_check = await self.checking_url(downloadable)
-        if first_check:
-            return first_check
+        checking_with_url = await self.checking_url(downloadable)
+        if checking_with_url:
+            return checking_with_url
 
-        second_check = await self.checking_id(downloadable)
-        if second_check:
-            return second_check
+        cheking_with_yt_id = await self.checking_id(downloadable)
+        if cheking_with_yt_id:
+            return cheking_with_yt_id
 
         raise NotFound(downloadable)
