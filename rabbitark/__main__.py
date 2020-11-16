@@ -26,6 +26,8 @@ parser.add_argument("--folder", type=str, help="")
 
 parser.add_argument("--cookies", type=str, help="load cookies.txt")
 
+parser.add_argument("--page", type=int, help="Youtube page limit")
+
 args: argparse.Namespace = parser.parse_args()
 
 if args.base:
@@ -36,5 +38,8 @@ if not args.folder:
 
 if args.cookies:
     config.COOKIES = load_cookie_txt(args.cookies)
+
+if args.page:
+    config.YOUTUBE_PAGE_LIMIT = args.page
 
 asyncio.run(RabbitArk(args.extractor).start(args.downloadable))

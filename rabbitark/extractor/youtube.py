@@ -66,6 +66,7 @@ from typing import Any, Dict, List, Match, Optional, Pattern
 from rabbitark.error import NotFound
 from rabbitark.utils.default_class import Image, DownloadInfo, Response
 from rabbitark.utils.request import Requester
+from rabbitark.config import config
 
 VALID_URL: str = r"""(?x)^
                      (
@@ -272,7 +273,7 @@ class YoutubeRequester(Requester):
             )
 
         continuations_url: Optional[str] = extract_playlist(firstPlaylistData)
-        for _ in range(6):
+        for _ in range(config.YOUTUBE_PAGE_LIMIT):
             if not continuations_url:
                 break
 
@@ -308,7 +309,8 @@ class YoutubeRequester(Requester):
                 if yt_id.startswith(prefix):
                     return await self.make_info_playlist(yt_id)
 
-            return
+            else:
+                return
 
         return self.make_info_video(yt_id)
 
