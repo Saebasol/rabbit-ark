@@ -4,6 +4,7 @@ from typing import List, Optional, Tuple
 
 from rabbitark.utils import Requester
 from rabbitark.utils.default_class import Image, DownloadInfo
+from rabbitark.rabbitark import RabbitArk
 
 
 class HitomiImageModel:
@@ -65,7 +66,7 @@ class HitomiRequester(Requester):
         ]
         return images, galleryinfomodel
 
-
+@RabbitArk.register("hitomi")
 class Hitomi(HitomiRequester):
     def __init__(self) -> None:
         super().__init__()

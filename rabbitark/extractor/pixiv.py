@@ -5,6 +5,7 @@ from rabbitark.error import NotFound
 from rabbitark.utils.default_class import Image, DownloadInfo
 from rabbitark.utils.request import Requester
 from rabbitark.utils.utils import folder_name_checker, get_urls, split
+from rabbitark.rabbitark import RabbitArk
 
 
 class PixivRequester(Requester):
@@ -96,6 +97,7 @@ class PixivRequester(Requester):
         )
 
 
+@RabbitArk.register("pixiv")
 class Pixiv(PixivRequester):
     def __init__(self):
         super().__init__()

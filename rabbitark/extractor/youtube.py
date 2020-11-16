@@ -63,6 +63,7 @@ import json
 import re
 from typing import Any, Dict, List, Match, Optional, Pattern
 
+from rabbitark.rabbitark import RabbitArk
 from rabbitark.error import NotFound
 from rabbitark.utils.default_class import Image, DownloadInfo, Response
 from rabbitark.utils.request import Requester
@@ -330,7 +331,7 @@ class YoutubeRequester(Requester):
             playlist_id,
         )
 
-
+@RabbitArk.register('youtube')
 class Youtube(YoutubeRequester):
     def __init__(self):
         super().__init__()
