@@ -4,9 +4,9 @@ import multiprocessing
 import sys
 
 from rabbitark.config import config
+from rabbitark.extractor import load
 from rabbitark.rabbitark import RabbitArk
 from rabbitark.utils.utils import load_cookie_txt
-from rabbitark.extractor import load
 
 if getattr(sys, "frozen", False):
     multiprocessing.freeze_support()
