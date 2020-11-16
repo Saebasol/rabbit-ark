@@ -66,6 +66,7 @@ class HitomiRequester(Requester):
         ]
         return images, galleryinfomodel
 
+
 @RabbitArk.register("hitomi")
 class Hitomi(HitomiRequester):
     def __init__(self) -> None:

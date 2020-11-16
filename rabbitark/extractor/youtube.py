@@ -331,7 +331,8 @@ class YoutubeRequester(Requester):
             playlist_id,
         )
 
-@RabbitArk.register('youtube')
+
+@RabbitArk.register("youtube")
 class Youtube(YoutubeRequester):
     def __init__(self):
         super().__init__()
