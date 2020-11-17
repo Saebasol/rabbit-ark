@@ -1,6 +1,7 @@
 import os
 import re
 import traceback
+from importlib import import_module
 
 directory = os.path.dirname(os.path.realpath(__file__))
 
@@ -12,7 +13,7 @@ def load():
         re.sub(".py", "", file) for file in os.listdir(directory) if not "__" in file
     ]:
         try:
-            __import__("rabbitark.extractor." + extension)
+            import_module("rabbitark.extractor." + extension)
         except:
             traceback.print_exc()
             failed.append(extension)

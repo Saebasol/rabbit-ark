@@ -26,12 +26,10 @@ class RabbitArk(
         return wrapper
 
     async def start(self, downloadable: Any = None) -> None:
-
-        if self.option not in self.extractor_dict:
-            if config.CUSTOM_EXTRACTOR:
-                if os.path.isfile(config.CUSTOM_EXTRACTOR):
-                    import_dynamic_module(config.CUSTOM_EXTRACTOR)
-        else:
+        if config.CUSTOM_EXTRACTOR:
+            if os.path.isfile(config.CUSTOM_EXTRACTOR):
+                import_dynamic_module(config.CUSTOM_EXTRACTOR)
+        elif self.option not in self.extractor_dict:
             raise ExtractorNotFound(self.option)
 
         init_class: RabbitArkABC = self.extractor_dict[self.option]()
