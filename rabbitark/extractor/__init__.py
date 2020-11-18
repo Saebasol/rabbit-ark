@@ -1,8 +1,8 @@
 import os
 import re
+import sys
 import traceback
 from importlib import import_module
-import sys
 
 if getattr(sys, "frozen", False):
     directory = getattr(sys, "_MEIPASS", os.path.abspath(os.path.dirname(__file__)))
