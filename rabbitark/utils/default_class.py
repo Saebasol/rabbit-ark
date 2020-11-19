@@ -1,6 +1,5 @@
 import abc
-from abc import abstractmethod
-from typing import Any, List, Optional, Union
+from typing import Any, List, Optional
 
 from rabbitark.utils.utils import split
 
@@ -35,10 +34,10 @@ class Response:
 
 
 class RabbitArkABC(metaclass=abc.ABCMeta):
-    @abstractmethod
+    @abc.abstractmethod
     async def extractor_download(self, downloadable) -> DownloadInfo:
         pass
 
-    @abstractmethod
+    @abc.abstractmethod
     async def extractor_multiple_download(self, downloadable) -> List[DownloadInfo]:
         pass
