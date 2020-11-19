@@ -17,20 +17,32 @@ class Requester:
     async def request(
         self, url: str, method: str, response_method: str, *args, **kwargs
     ) -> Response:
-        async with aiohttp.ClientSession(*self.args, **self.kwargs) as cs:
-            async with cs.request(method, url, *args, **kwargs) as response:
-                dispatch: Dict[str, Any] = {
-                    "json": response.json,
-                    "read": response.read,
-                    "text": response.text,
-                }
-                if response_method not in dispatch:
-                    raise ValueError(
-                        f"Invalid response_method value: {response_method}"
-                    )
-                return Response(
-                    response.status, response.reason, await dispatch[response_method]()
-                )
+        async with aiohttp.ClientSession(*self.args, **self.kwargs) as session:
+            response = await self.fetch(
+                session, method, response_method, url, *args, **kwargs
+            )
+            return response
+
+    async def fetch(
+        self,
+        session: aiohttp.ClientSession,
+        method: str,
+        response_method: str,
+        url: str,
+        *args,
+        **kwargs,
+    ):
+        async with session.request(url, method, *args, **kwargs) as response:
+            dispatch: Dict[str, Any] = {
+                "json": response.json,
+                "read": response.read,
+                "text": response.text,
+            }
+            if response_method not in dispatch:
+                raise ValueError(f"Invalid response_method value: {response_method}")
+            return Response(
+                response.status, response.reason, await dispatch[response_method]()
+            )
 
     async def get(
         self, url: str, response_method: str = "read", *args, **kwargs
