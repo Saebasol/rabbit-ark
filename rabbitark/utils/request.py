@@ -32,7 +32,7 @@ class Requester:
         *args,
         **kwargs,
     ):
-        async with session.request(url, method, *args, **kwargs) as response:
+        async with session.request(method, url, *args, **kwargs) as response:
             dispatch: Dict[str, Any] = {
                 "json": response.json,
                 "read": response.read,
