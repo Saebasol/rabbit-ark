@@ -19,16 +19,16 @@ class Requester:
     ) -> Response:
         async with aiohttp.ClientSession(*self.args, **self.kwargs) as session:
             response = await self.fetch(
-                session, method, response_method, url, *args, **kwargs
+                session, url, method, response_method, *args, **kwargs
             )
             return response
 
     async def fetch(
         self,
         session: aiohttp.ClientSession,
+        url: str,
         method: str,
         response_method: str,
-        url: str,
         *args,
         **kwargs,
     ):
