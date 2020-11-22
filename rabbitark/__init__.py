@@ -1,5 +1,5 @@
-from collections import namedtuple
 import sys
+from collections import namedtuple
 
 __version__ = "0.1.0"
 
