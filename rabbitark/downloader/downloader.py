@@ -1,3 +1,4 @@
+import logging
 import os
 from functools import wraps
 from typing import Generator, List, Optional, Union
@@ -9,6 +10,8 @@ from aiomultiprocess import Pool  # type: ignore
 from rabbitark.config import config
 from rabbitark.utils import Requester
 from rabbitark.utils.default_class import DownloadInfo, RequestInfo, Response
+
+logger = logging.getLogger("rabbitark.downloader.downloader")
 
 
 class Downloader(Requester):
