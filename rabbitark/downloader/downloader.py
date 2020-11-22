@@ -54,11 +54,10 @@ class Downloader(Requester):
             ]
 
     async def download(self, download_info: RequestInfo) -> None:
-        image_byte: Response = await self.get(
+        response: Response = await self.get(
             download_info.url, headers=download_info.headers
         )
-        async with aiofiles.open(download_info.directory, mode="wb") as f:  # type: ignore
-            await f.write(image_byte.body)
+        return download_info.directory, response.body
 
     async def start_download(self, info: DownloadInfo) -> None:
         download_info: Union[Generator, List[RequestInfo]] = self.checking_image_object(
@@ -66,8 +65,9 @@ class Downloader(Requester):
         )
         await self.create_folder(info.title)
         async with Pool() as pool:
-            async for _ in pool.map(self.download, download_info):
-                pass
+            async for directory, image_byte in pool.map(self.download, download_info):
+                async with aiofiles.open(directory, mode="wb") as f:  # type: ignore
+                    await f.write(image_byte)
 
     async def start_multiple_download(self, info_list: List[DownloadInfo]) -> None:
         async with Pool() as pool:
