@@ -161,9 +161,8 @@ PLAYLIST_VALID_URL: str = r"""(?x)(?:
                     (%(playlist_id)s)
                     )"""
 
-
 DATA_JSON: Pattern = re.compile(
-    r"(?:window\[\"ytInitialData\"\]|var ytInitialData)\s*=\s*(\{.*\})"
+    r'(?:window\["ytInitialData"\]|ytInitialData)\W?=\W?({.*?});'
 )
 
 PLAYLIST_PREFIX_LIST: List[str] = [
