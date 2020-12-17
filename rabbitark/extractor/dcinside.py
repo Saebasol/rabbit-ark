@@ -4,6 +4,7 @@ from rabbitark.utils import Request
 from rabbitark.rabbitark import RabbitArk
 from typing import Any
 
+
 class DcinsideRequester(Request):
     def __init__(self) -> None:
         super().__init__(
@@ -13,19 +14,21 @@ class DcinsideRequester(Request):
                 "referer": "https://images.dcinside.com",
             }
         )
+
     async def image(self, url: str):
-            id = url.split("=")[1]
-            no = url.split("=")[2]
-            return f"https://images.dcinside.com/viewimagePop.php?id={id}&no={no}"
-    
+        id = url.split("=")[1]
+        no = url.split("=")[2]
+        return f"https://images.dcinside.com/viewimagePop.php?id={id}&no={no}"
+
     async def images(self, url: str):
         pass
+
 
 @RabbitArk.register("dcinside")
 class Dcinside(DcinsideRequester):
     def __init__(self):
         super().__init__()
-        
+
     async def extractor_download(self, downloadable: Any) -> DownloadInfo:
         if downloadable != None:
             await self.images(downloadable)
