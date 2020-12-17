@@ -67,7 +67,7 @@ from rabbitark.config import config
 from rabbitark.error import NotFound
 from rabbitark.rabbitark import RabbitArk
 from rabbitark.utils.default_class import DownloadInfo, Image, Response
-from rabbitark.utils.request import Requester
+from rabbitark.utils.request import Request
 
 VALID_URL: str = r"""(?x)^
                      (
@@ -179,7 +179,7 @@ PLAYLIST_PREFIX_LIST: List[str] = [
 ]
 
 
-class YoutubeRequester(Requester):
+class YoutubeRequester(Request):
     def __init__(self) -> None:
         super().__init__(
             headers={

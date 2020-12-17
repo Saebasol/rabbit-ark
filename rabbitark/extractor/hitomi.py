@@ -3,7 +3,7 @@ import re
 from typing import List, Optional, Tuple
 
 from rabbitark.rabbitark import RabbitArk
-from rabbitark.utils import Requester
+from rabbitark.utils import Request
 from rabbitark.utils.default_class import DownloadInfo, Image
 
 
@@ -40,7 +40,7 @@ class HitomiGalleryInfoModel:
         self.type_ = type_
 
 
-class HitomiRequester(Requester):
+class HitomiRequester(Request):
     def __init__(self):
         super().__init__(
             headers={

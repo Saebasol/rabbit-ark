@@ -4,11 +4,11 @@ from rabbitark.config import config
 from rabbitark.error import NotFound
 from rabbitark.rabbitark import RabbitArk
 from rabbitark.utils.default_class import DownloadInfo, Image
-from rabbitark.utils.request import Requester
+from rabbitark.utils.request import Request
 from rabbitark.utils.utils import folder_name_checker, get_urls, split
 
 
-class PixivRequester(Requester):
+class PixivRequester(Request):
     def __init__(self):
         super().__init__(
             headers={

@@ -8,13 +8,13 @@ import aiofiles.os as aioos  # type: ignore
 from aiomultiprocess import Pool  # type: ignore
 
 from rabbitark.config import config
-from rabbitark.utils import Requester
+from rabbitark.utils import Request
 from rabbitark.utils.default_class import DownloadInfo, RequestInfo, Response
 
 logger = logging.getLogger("rabbitark.downloader.downloader")
 
 
-class Downloader(Requester):
+class Downloader(Request):
     def __init__(self) -> None:
         super().__init__()
         self.base_directory: str = config.BASE_DIRECTORY
