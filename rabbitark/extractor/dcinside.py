@@ -1,8 +1,9 @@
-from rabbitark.error import NotFound
-from rabbitark.utils.default_class import DownloadInfo
-from rabbitark.utils import Request
-from rabbitark.rabbitark import RabbitArk
 from typing import Any
+
+from rabbitark.error import NotFound
+from rabbitark.rabbitark import RabbitArk
+from rabbitark.utils import Request
+from rabbitark.utils.default_class import DownloadInfo
 
 
 class DcinsideRequester(Request):
