@@ -2,9 +2,11 @@ import json
 import re
 from typing import List, Optional, Tuple
 
+from rabbitark.abc import BaseExtractor
+from rabbitark.config import Config
+from rabbitark.dataclass import DownloadInfo, Image
 from rabbitark.rabbitark import RabbitArk
-from rabbitark.utils import Request
-from rabbitark.utils.default_class import DownloadInfo, Image
+from rabbitark.request import Request
 
 
 class HitomiImageModel:
@@ -41,17 +43,14 @@ class HitomiGalleryInfoModel:
 
 
 class HitomiRequester(Request):
-    def __init__(self):
-        super().__init__(
-            headers={
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36",
-                "referer": "https://hitomi.la",
-            }
-        )
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36",
+        "referer": "https://hitomi.la",
+    }
 
-    async def get_galleryinfo(self, index):
+    async def get_galleryinfo(self, index: int):
         response = await self.get(f"https://ltn.hitomi.la/galleries/{index}.js", "text")
-        js_to_json = response.body.replace("var galleryinfo = ", "")
+        js_to_json = response.replace("var galleryinfo = ", "")
         return parse_galleryinfo(json.loads(js_to_json))
 
     async def images(
@@ -68,23 +67,18 @@ class HitomiRequester(Request):
 
 
 @RabbitArk.register("hitomi")
-class Hitomi(HitomiRequester):
-    def __init__(self) -> None:
-        super().__init__()
-
-    async def extractor_download(self, index: int) -> Optional[DownloadInfo]:
+class Hitomi(HitomiRequester, BaseExtractor):
+    async def get_download_info(
+        self, download_source: int, config: Config
+    ) -> DownloadInfo:
         images: Optional[
             Tuple[List[Image], HitomiGalleryInfoModel]
-        ] = await self.images(index)
+        ] = await self.images(download_source)
 
         if not images:
             return None
 
-        return DownloadInfo(images[0], images[1].galleryid, self.headers)
-
-    async def extractor_multiple_download(self, index_list: list):
-        for index in index_list:
-            yield self.extractor_download(index)
+        return DownloadInfo(images[0], images[1].galleryid, headers=self.headers)
 
 
 def subdomain_from_galleryid(g: int, number_of_frontends: int) -> str:

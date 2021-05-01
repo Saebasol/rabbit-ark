@@ -1,13 +1,30 @@
 from __future__ import annotations
-from asyncio.tasks import wait
 
-from typing import Any, Awaitable, Callable, Literal, Optional
+from asyncio.tasks import wait
+from functools import wraps
+from math import ceil
+from typing import Any, Awaitable, Callable, Literal, Optional, cast
 
 from aiohttp import ClientSession
-from math import ceil
+
+from rabbitark.abc import BaseExtractor, BaseRequest
+from rabbitark.typing import CA
 
 
-class Request:
+def close(f: CA) -> CA:
+    @wraps(f)
+    async def wrapper(self: BaseExtractor, *args: Any, **kwargs: Any):
+        try:
+            result = await f(self, *args, **kwargs)
+        finally:
+            if self.session:
+                await self.session.close()
+        return result
+
+    return cast(CA, wrapper)
+
+
+class Request(BaseRequest):
     def __init__(self) -> None:
         self.session: Optional[ClientSession] = None
 
@@ -28,6 +45,7 @@ class Request:
         return_method: Literal["json", "text", "read"],
     ) -> Any:
         if not self.session:
+            print("we make session")
             self.session = ClientSession()
         return await self.request(self.session, url, "GET", return_method)
 
@@ -55,22 +73,24 @@ class SessionPoolRequest(Request):
         url: list[str],
         method: str,
         return_method: Optional[Literal["json", "text", "read"]] = None,
-        division: int = 10,
+        request_per_session: int = 10,
         **kwargs: Any,
     ):
         try:
-            pool_size = ceil(len(url) / division)
+            pool_size = ceil(len(url) / request_per_session)
 
-            division_url_list = [
+            request_per_session_url_list = [
                 url[pos : pos + pool_size] for pos in range(0, len(url), pool_size)
             ]
 
-            for _ in range(len(division_url_list)):
+            for _ in range(len(request_per_session_url_list)):
                 self.session_pool.append(ClientSession())
 
             request_list = [
                 request_func(session, url, method, return_method, **kwargs)
-                for session, url_list in zip(self.session_pool, division_url_list)
+                for session, url_list in zip(
+                    self.session_pool, request_per_session_url_list
+                )
                 for url in url_list
             ]
 
@@ -86,20 +106,20 @@ class SessionPoolRequest(Request):
         self,
         url: list[str],
         return_method: Literal["json", "text", "read"],
-        division: int = 10,
+        request_per_session: int = 10,
         **kwargs: Any,
     ):
         return await self.request_using_session_pool(
-            self.request, url, "GET", return_method, division, **kwargs
+            self.request, url, "GET", return_method, request_per_session, **kwargs
         )
 
     async def multiple_post(
         self,
         url: list[str],
         return_method: Literal["json", "text", "read"],
-        division: int = 10,
+        request_per_session: int = 10,
         **kwargs: Any,
     ):
         return await self.request_using_session_pool(
-            self.request, url, "POST", return_method, division, **kwargs
+            self.request, url, "POST", return_method, request_per_session, **kwargs
         )
