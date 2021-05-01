@@ -29,18 +29,22 @@ class Downloader(SessionPoolRequest):
             async for data, _ in response.content.iter_chunks():
                 await f.write(data)
 
-    async def create_folder(self, title: Optional[str] = None) -> None:
-        if not exists(f"{self.config.BASE_DIRECTORY}/{self.config.FOLDER}"):
-            await mkdir(f"{self.config.BASE_DIRECTORY}/{self.config.FOLDER}")
+    async def create_folder(self, title: Optional[str] = None) -> str:
+        default_dir = f"{self.config.BASE_DIRECTORY}/{self.config.FOLDER}/"
+        if not exists(default_dir):
+            await mkdir(default_dir)
 
         if title:
-            if not exists(f"{self.config.BASE_DIRECTORY}/{self.config.FOLDER}/{title}"):
-                await mkdir(
-                    f"{self.config.BASE_DIRECTORY}/{self.config.FOLDER}/{title}"
-                )
+            if not exists(f"{default_dir}/{title}"):
+                await mkdir(f"{default_dir}/{title}")
+
+            return f"{default_dir}/{title}/"
+
+        return default_dir
 
     async def start_download(self, download_info: DownloadInfo):
-        filename_mapping = download_info.to_download(self.config.BASE_DIRECTORY)
+        directory = await self.create_folder(download_info.title)
+        filename_mapping = download_info.to_download(directory)
         url_list = list(filename_mapping.keys())
         await self.request_using_session_pool(
             self.download,
