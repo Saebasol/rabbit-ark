@@ -1,23 +1,24 @@
-from typing import Any, Dict, List, Optional
+from typing import Optional
 
 
-class _Config:
-    __slots__: List[str] = [
+class Config:
+    __slots__: list[str] = [
         "BASE_DIRECTORY",
         "FOLDER",
         "COOKIES",
         "YOUTUBE_PAGE_LIMIT",
         "CUSTOM_EXTRACTOR",
+        "REQUEST_PER_SESSION",
     ]
 
     def __init__(self) -> None:
         self.BASE_DIRECTORY: str = "."
         self.FOLDER: Optional[str] = None
-        self.COOKIES: Dict[str, Any] = {}
+        self.COOKIES: dict[str, Optional[str]] = {}
         self.CUSTOM_EXTRACTOR: Optional[str] = None
 
         # extractor config
         self.YOUTUBE_PAGE_LIMIT: int = 6
 
-
-config: _Config = _Config()
+        # download config
+        self.REQUEST_PER_SESSION: int = 10

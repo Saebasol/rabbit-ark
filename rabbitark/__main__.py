@@ -1,14 +1,13 @@
 import argparse
-import asyncio
 import logging
-import multiprocessing
 import platform
 import sys
+from asyncio.events import get_event_loop
 
-from rabbitark.config import config
+from rabbitark.config import Config
 from rabbitark.extractor import load
 from rabbitark.rabbitark import RabbitArk
-from rabbitark.utils.utils import load_cookie_txt
+from rabbitark.utils import load_cookie_txt
 
 logger = logging.getLogger("rabbitark")
 logger.setLevel(logging.DEBUG)
@@ -23,11 +22,9 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 
-if getattr(sys, "frozen", False):
-    multiprocessing.freeze_support()
-    logger.info("detect exe called freeze_support")
+config = Config()
 
-parser: argparse.ArgumentParser = argparse.ArgumentParser("rabbitark")
+parser = argparse.ArgumentParser("rabbitark")
 
 parser.add_argument("extractor", type=str, help="Specifies the extractor name")
 
@@ -53,7 +50,7 @@ parser.add_argument(
 
 parser.add_argument("--report", action="store_true", help="save debugging informaion")
 
-args: argparse.Namespace = parser.parse_args()
+args = parser.parse_args()
 
 if args.base:
     config.BASE_DIRECTORY = args.folder
@@ -88,5 +85,7 @@ load()
 logger.info("sucessfully import extractor")
 
 logger.debug("start loop")
-asyncio.run(RabbitArk(args.extractor).start(args.downloadable))
+get_event_loop().run_until_complete(
+    RabbitArk(args.extractor, config).start(args.downloadable)
+)
 logger.debug("complete loop")
