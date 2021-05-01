@@ -3,12 +3,12 @@ from __future__ import annotations
 from asyncio.tasks import wait
 from functools import wraps
 from math import ceil
-from typing import Any, Awaitable, Callable, Literal, Optional, cast
+from typing import Any, Awaitable, Callable, Optional, cast
 
 from aiohttp import ClientSession
 
 from rabbitark.abc import BaseExtractor, BaseRequest
-from rabbitark.typing import CA
+from rabbitark.typing import CA, RETURN_METHOD
 
 
 def close(f: CA) -> CA:
@@ -33,7 +33,7 @@ class Request(BaseRequest):
         session: ClientSession,
         url: str,
         method: str,
-        return_method: Literal["json", "text", "read"],
+        return_method: RETURN_METHOD,
         **kwargs: Any,
     ):
         response = await session.request(method, url, **kwargs)
@@ -42,7 +42,7 @@ class Request(BaseRequest):
     async def get(
         self,
         url: str,
-        return_method: Literal["json", "text", "read"],
+        return_method: RETURN_METHOD,
     ) -> Any:
         if not self.session:
             print("we make session")
@@ -52,7 +52,7 @@ class Request(BaseRequest):
     async def post(
         self,
         url: str,
-        return_method: Literal["json", "text", "read"],
+        return_method: RETURN_METHOD,
     ) -> Any:
         if not self.session:
             self.session = ClientSession()
@@ -72,7 +72,7 @@ class SessionPoolRequest(Request):
         request_func: Callable[..., Awaitable[Any]],
         url: list[str],
         method: str,
-        return_method: Optional[Literal["json", "text", "read"]] = None,
+        return_method: Optional[RETURN_METHOD] = None,
         request_per_session: int = 10,
         **kwargs: Any,
     ):
@@ -105,7 +105,7 @@ class SessionPoolRequest(Request):
     async def multiple_get(
         self,
         url: list[str],
-        return_method: Literal["json", "text", "read"],
+        return_method: RETURN_METHOD,
         request_per_session: int = 10,
         **kwargs: Any,
     ):
@@ -116,7 +116,7 @@ class SessionPoolRequest(Request):
     async def multiple_post(
         self,
         url: list[str],
-        return_method: Literal["json", "text", "read"],
+        return_method: RETURN_METHOD,
         request_per_session: int = 10,
         **kwargs: Any,
     ):
