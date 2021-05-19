@@ -2,6 +2,7 @@
 
 [![Code Style](https://img.shields.io/badge/code%20style-black-black)](https://github.com/psf/black)
 
+> **Warning!** Only Python 3.9 or higher can guarantee normal operation.  
 > Scalable downloader that downloads asynchronously
 
 - [Rabbit Ark](#rabbit-ark)
@@ -15,8 +16,6 @@
 ## Description
 
 This program is inspired by [YouTube-dl](https://github.com/ytdl-org/youtube-dl/) and [Hitomi Downloader](https://github.com/KurtBestor/Hitomi-Downloader)
-
-The download is processed using the [aiomultiprocess](https://github.com/omnilib/aiomultiprocess) module.
 
 ### Download
 
