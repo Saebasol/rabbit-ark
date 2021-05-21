@@ -1,30 +1,33 @@
-import os
 from typing import Any
 
-from rabbitark.downloader.downloader import Downloader
-from rabbitark.error import ExtractorNotFound
-from rabbitark.utils.extractor_dict import extractor
-from rabbitark.utils.load_dynamic_module import load_extensions
+from rabbitark.abc import BaseExtractor
+from rabbitark.config import Config
+from rabbitark.downloader import Downloader
 
 
 class RabbitArk(Downloader):
-    def __init__(self, option):
-        super().__init__()
-        self.option = option
+    extractor_dict: dict[str, type[BaseExtractor]] = {}
 
-    async def start(self, downloadable: Any = None):
-        if self.option in extractor:
-            init_class = extractor[self.option]()
+    def __init__(self, extractor_name: str, config: Config) -> None:
+        self.extractor_name = extractor_name
+        super().__init__(config)
 
-        elif os.path.isfile(self.option):
-            init_class = load_extensions(self.option)
+    @classmethod
+    def register(cls, extractor_name: str):
+        def wrapper(wrapped_class: type[BaseExtractor]):
 
-        else:
-            raise ExtractorNotFound(self.option)
+            cls.extractor_dict[extractor_name] = wrapped_class
+            return wrapped_class
 
-        if isinstance(downloadable, list):
-            infos = await init_class.multiple_download_info(downloadable)
-            await self.start_multiple_download(infos)
-        else:
-            info = await init_class.download_info(downloadable)
-            await self.start_download(info)
+        return wrapper
+
+    async def start(self, download_source: Any) -> None:
+        init_class = self.extractor_dict[self.extractor_name]()
+        try:
+            download_info = await init_class.get_download_info(
+                download_source, self.config
+            )
+        finally:
+            if init_class.session:
+                await init_class.session.close()
+        await self.start_download(download_info)

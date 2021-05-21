@@ -1,8 +1,12 @@
 import json
 import re
+from typing import List, Optional, Tuple
 
-from rabbitark.utils import Requester
-from rabbitark.utils.default_class import Image, Info
+from rabbitark.abc import BaseExtractor
+from rabbitark.config import Config
+from rabbitark.dataclass import DownloadInfo, Image
+from rabbitark.rabbitark import RabbitArk
+from rabbitark.request import Request
 
 
 class HitomiImageModel:
@@ -17,15 +21,15 @@ class HitomiImageModel:
 class HitomiGalleryInfoModel:
     def __init__(
         self,
-        language_localname: str,
-        language: str,
-        date: str,
-        files: list,
-        tags: list,
-        japanese_title: str,
-        title: str,
-        galleryid: int,
-        type_: str,
+        language_localname: Optional[str],
+        language: Optional[str],
+        date: Optional[str],
+        files: Optional[List],
+        tags: Optional[List],
+        japanese_title: Optional[str],
+        title: Optional[str],
+        galleryid: Optional[int],
+        type_: Optional[str],
     ):
         self.language_localname = language_localname
         self.language = language
@@ -38,21 +42,20 @@ class HitomiGalleryInfoModel:
         self.type_ = type_
 
 
-class HitomiRequester(Requester):
-    def __init__(self):
-        super().__init__(
-            headers={
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36",
-                "referer": "https://hitomi.la",
-            }
-        )
+class HitomiRequester(Request):
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36",
+        "referer": "https://hitomi.la",
+    }
 
-    async def get_galleryinfo(self, index):
+    async def get_galleryinfo(self, index: int):
         response = await self.get(f"https://ltn.hitomi.la/galleries/{index}.js", "text")
-        js_to_json = response.body.replace("var galleryinfo = ", "")
+        js_to_json = response.replace("var galleryinfo = ", "")
         return parse_galleryinfo(json.loads(js_to_json))
 
-    async def images(self, index: int) -> tuple[list[Image], HitomiGalleryInfoModel]:
+    async def images(
+        self, index: int
+    ) -> Optional[Tuple[List[Image], HitomiGalleryInfoModel]]:
         galleryinfomodel = await self.get_galleryinfo(index)
         if not galleryinfomodel:
             return None
@@ -63,17 +66,19 @@ class HitomiRequester(Requester):
         return images, galleryinfomodel
 
 
-class Hitomi(HitomiRequester):
-    def __init__(self) -> None:
-        super().__init__()
+@RabbitArk.register("hitomi")
+class Hitomi(HitomiRequester, BaseExtractor):
+    async def get_download_info(
+        self, download_source: int, config: Config
+    ) -> DownloadInfo:
+        images: Optional[
+            Tuple[List[Image], HitomiGalleryInfoModel]
+        ] = await self.images(download_source)
 
-    async def download_info(self, index) -> Info:
-        images, model = await self.images(index)
-        return Info(images, model.galleryid, self.headers)
+        if not images:
+            return None
 
-    async def multiple_download_info(self, index_list: list):
-        for index in index_list:
-            yield self.download_info(index)
+        return DownloadInfo(images[0], images[1].galleryid, headers=self.headers)
 
 
 def subdomain_from_galleryid(g: int, number_of_frontends: int) -> str:
@@ -82,7 +87,7 @@ def subdomain_from_galleryid(g: int, number_of_frontends: int) -> str:
     return r
 
 
-def subdomain_from_url(url: str) -> str:
+def subdomain_from_url(url: str) -> Optional[str]:
     retval = "b"
 
     number_of_frontends = 3
@@ -90,6 +95,9 @@ def subdomain_from_url(url: str) -> str:
 
     r = re.compile(r"\/[0-9a-f]\/([0-9a-f]{2})\/")
     m = r.search(url)
+
+    if not m:
+        return None
 
     g = int(m[1], b)
 
@@ -156,7 +164,7 @@ def image_url_from_image(galleryid: int, image: HitomiImageModel, no_webp: bool)
 
 def parse_galleryinfo(galleryinfo_json: dict) -> HitomiGalleryInfoModel:
     if not galleryinfo_json["tags"]:
-        parsed_tags = []
+        parsed_tags: List = []
     else:
         parsed_tags = []
         for tag in galleryinfo_json["tags"]:
