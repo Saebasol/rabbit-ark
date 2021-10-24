@@ -1,0 +1,10 @@
+{
+    "global": {
+        "limit": 10
+    },
+    "pixiv": {
+        "cookies": ""
+    },
+    "hitomi": {},
+    "youtube": {}
+}
